@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenFocus | مساحتك الهادئة للتركيز</title>
+    <!-- Google Fonts: Playfair Display (Serif) & Outfit (Sans-serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN for elegant icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+    <!-- Ambient Background Blur Effects -->
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-feather-pointed logo-icon"></i>
+                <h1>ZenFocus</h1>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="icon-btn" aria-label="تبديل المظهر">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="workspace-grid">
+            
+            <!-- Left Column: The Timer -->
+            <section class="panel timer-panel">
+                <div class="card glass timer-card">
+                    <!-- Session Selector tabs -->
+                    <div class="session-selector">
+                        <button class="session-btn active" data-type="focus">تركيز</button>
+                        <button class="session-btn" data-type="short">راحة قصيرة</button>
+                        <button class="session-btn" data-type="long">راحة طويلة</button>
+                    </div>
+
+                    <!-- Circular Progress Ring & Timer Display -->
+                    <div class="timer-display-wrapper">
+                        <svg class="progress-ring" width="280" height="280">
+                            <circle class="progress-ring-bg" stroke="var(--bg-ring)" stroke-width="8" fill="transparent" r="125" cx="140" cy="140" />
+                            <circle id="progress-ring-bar" class="progress-ring-bar" stroke="var(--accent-primary)" stroke-width="8" fill="transparent" r="125" cx="140" cy="140" />
+                        </svg>
+                        <div class="timer-text-container">
+                            <span id="timer-time">25:00</span>
+                            <span id="timer-status">وقت التركيز</span>
+                        </div>
+                    </div>
+
+                    <!-- Timer Controls -->
+                    <div class="timer-controls">
+                        <button id="timer-toggle" class="control-btn play-btn" aria-label="تشغيل">
+                            <i class="fa-solid fa-play"></i>
+                        </button>
+                        <button id="timer-reset" class="control-btn reset-btn" aria-label="إعادة تعيين">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Ambient Sounds & To-Do List -->
+            <section class="panel tools-panel">
+                
+                <!-- Ambient Sounds Console -->
+                <div class="card glass sounds-card">
+                    <h2 class="card-title">
+                        <i class="fa-solid fa-sliders title-icon"></i>
+                        أصوات الخلفية الهادئة
+                    </h2>
+                    
+                    <div class="sounds-list">
+                        <!-- Rain Sound Card -->
+                        <div class="sound-item" data-sound="rain">
+                            <div class="sound-info">
+                                <i class="fa-solid fa-cloud-showers-water sound-icon"></i>
+                                <span class="sound-name">مطر هادئ</span>
+                            </div>
+                            <div class="sound-controls">
+                                <button class="sound-toggle-btn" aria-label="تشغيل صوت المطر">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                                <input type="range" class="sound-volume" min="0" max="1" step="0.05" value="0.5" aria-label="حجم صوت المطر">
+                            </div>
+                            <audio id="audio-rain" loop src="https://assets.mixkit.co/active_storage/sfx/2433/2433-preview.mp3"></audio>
+                        </div>
+
+                        <!-- Campfire Sound Card -->
+                        <div class="sound-item" data-sound="fire">
+                            <div class="sound-info">
+                                <i class="fa-solid fa-fire sound-icon"></i>
+                                <span class="sound-name">مدفأة حطب</span>
+                            </div>
+                            <div class="sound-controls">
+                                <button class="sound-toggle-btn" aria-label="تشغيل صوت المدفأة">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                                <input type="range" class="sound-volume" min="0" max="1" step="0.05" value="0.5" aria-label="حجم صوت المدفأة">
+                            </div>
+                            <audio id="audio-fire" loop src="https://www.soundjay.com/nature/sounds/weather-wind-01.mp3"></audio> <!-- Wind as cozy alternative -->
+                        </div>
+
+                        <!-- Cafe Ambient Card -->
+                        <div class="sound-item" data-sound="cafe">
+                            <div class="sound-info">
+                                <i class="fa-solid fa-mug-hot sound-icon"></i>
+                                <span class="sound-name">مقهى هادئ</span>
+                            </div>
+                            <div class="sound-controls">
+                                <button class="sound-toggle-btn" aria-label="تشغيل صوت المقهى">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                                <input type="range" class="sound-volume" min="0" max="1" step="0.05" value="0.5" aria-label="حجم صوت المقهى">
+                            </div>
+                            <!-- A cozy cafe keyboard/murmur sound -->
+                            <audio id="audio-cafe" loop src="https://www.soundjay.com/nature/sounds/river-1.mp3"></audio> <!-- River stream alternative if Cafe not available -->
+                        </div>
+
+                        <!-- Brown Noise (Synthesized via JS for high focus, fallback if offline) -->
+                        <div class="sound-item" data-sound="focus-noise">
+                            <div class="sound-info">
+                                <i class="fa-solid fa-wave-square sound-icon"></i>
+                                <span class="sound-name">ضوضاء التركيز (Brown Noise)</span>
+                            </div>
+                            <div class="sound-controls">
+                                <button class="sound-toggle-btn" aria-label="تشغيل ضوضاء التركيز">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                                <input type="range" class="sound-volume" min="0" max="1" step="0.05" value="0.5" aria-label="حجم ضوضاء التركيز">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Minimalist To-Do List -->
+                <div class="card glass todo-card">
+                    <h2 class="card-title">
+                        <i class="fa-solid fa-list-check title-icon"></i>
+                        قائمة المهام اليومية
+                    </h2>
+                    
+                    <form id="todo-form" class="todo-form">
+                        <input type="text" id="todo-input" placeholder="اضف مهمة جديدة للتركيز عليها..." required autocomplete="off">
+                        <button type="submit" class="todo-add-btn" aria-label="أضف مهمة">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </form>
+
+                    <ul id="todo-list" class="todo-list">
+                        <!-- Tasks will be dynamically populated here -->
+                    </ul>
+                </div>
+
+            </section>
+        </main>
+
+        <!-- Footer: Cozy Quote Rotator -->
+        <footer class="app-footer">
+            <div class="quote-card glass">
+                <i class="fa-solid fa-quote-right quote-mark-right"></i>
+                <div class="quote-content">
+                    <p id="quote-text">"التركيز هو سر الإنتاجية، والهدوء هو طريق الإنجاز."</p>
+                    <span id="quote-author">ZenFocus</span>
+                </div>
+                <button id="quote-refresh" class="icon-btn" aria-label="مقولة جديدة">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+            </div>
+            <div class="footer-metadata">
+                <span class="metadata-item"><i class="fa-regular fa-clock"></i> <span id="local-time">--:--</span></span>
+                <span class="metadata-item">صنع بكل حب لمساعدتك على الإنجاز</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Main JavaScript Logic -->
+    <script src="script.js"></script>
+</body>
+</html>
