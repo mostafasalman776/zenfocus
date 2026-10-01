@@ -1,0 +1,13 @@
+{
+  "name": "zenfocus",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:api": "npm -w @zenfocus/api run dev",
+    "dev:web": "npm -w @zenfocus/web run dev",
+    "build": "npm -w @zenfocus/api run build && npm -w @zenfocus/web run build",
+    "typecheck": "npm -w @zenfocus/shared run typecheck && npm -w @zenfocus/api run typecheck && npm -w @zenfocus/web run typecheck",
+    "test": "npm -w @zenfocus/api run test"
+  }
+}

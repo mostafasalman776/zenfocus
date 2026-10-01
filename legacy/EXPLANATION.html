@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل شرح كود مشروع ZenFocus | جاهز للطباعة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2D3330;
+            --accent-color: #5A786B;
+            --bg-color: #FAF8F5;
+            --code-bg: #F3EFE9;
+            --text-color: #2D3330;
+            --border-color: #D6CFC7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Toolbar for PDF printing */
+        .print-toolbar {
+            background: #FFF;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .print-toolbar h4 {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .print-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(90, 120, 107, 0.2);
+        }
+
+        .print-btn:hover {
+            background-color: #486156;
+            transform: translateY(-1px);
+        }
+
+        /* Document Styling */
+        .document {
+            background: #FFF;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            font-weight: 900;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: var(--accent-color);
+            margin-top: 2.5rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3rem;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-top: 1.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+
+        ul {
+            margin-right: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.6rem;
+            font-size: 1.05rem;
+        }
+
+        li strong {
+            color: var(--accent-color);
+        }
+
+        /* Code snippets block */
+        pre {
+            background-color: var(--code-bg);
+            border-right: 4px solid var(--accent-color);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            direction: ltr;
+            font-family: 'Outfit', monospace;
+            font-size: 0.95rem;
+        }
+
+        code {
+            background-color: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Outfit', monospace;
+            font-size: 0.95rem;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .highlight-box {
+            background-color: rgba(90, 120, 107, 0.08);
+            border: 1px dashed var(--accent-color);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .highlight-box h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+
+        /* Printing optimizations */
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+                padding: 0;
+            }
+
+            .print-toolbar {
+                display: none; /* Hide printing toolbar on PDF */
+            }
+
+            .document {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+
+            h2, h3 {
+                page-break-after: avoid; /* Prevent headings from separating from content */
+            }
+
+            pre, .highlight-box {
+                page-break-inside: avoid; /* Keep code blocks on a single page */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Print Control Toolbar -->
+    <div class="print-toolbar">
+        <h4>دليل كود ZenFocus الجاهز للطباعة (PDF)</h4>
+        <button class="print-btn" onclick="window.print()">طباعة / حفظ كـ PDF</button>
+    </div>
+
+    <!-- Main Printable Document -->
+    <div class="document">
+        <h1>دليل فهم الكود بالتفصيل المبسط (ZenFocus)</h1>
+        <p>الموقع بتاعنا بيتكون من 3 ملفات رئيسية. عشان تفهمهم ببساطة، تخيل إننا بنبني <strong>بيت</strong>:</p>
+        <ul>
+            <li><strong>HTML</strong>: هو الطوب والخرسانة والتقسيم بتاع الأوض (هيكل البيت).</li>
+            <li><strong>CSS</strong>: هو المحارة والدهانات والديكورات والإضاءة (شكل البيت).</li>
+            <li><strong>JavaScript (JS)</strong>: هو شبكة الكهرباء والمفاتيح والأجهزة اللي بتشغل البيت (تفاعل البيت).</li>
+        </ul>
+
+        <h2>الجزء الأول: هيكل الموقع (HTML)</h2>
+        <p>ملف <code>index.html</code> هو المسؤول عن تحديد "إيه اللي هيظهر في الشاشة".</p>
+
+        <h3>1. الرأس (<code>&lt;head&gt;</code>)</h3>
+        <p>ده الجزء غير المرئي للمستخدم، بنحط فيه المعلومات الأساسية للمتصفح:</p>
+        <ul>
+            <li><strong><code>&lt;meta charset="UTF-8"&gt;</code></strong>: بنقول للمتصفح يفهم الحروف العربي بشكل صحيح.</li>
+            <li><strong><code>&lt;title&gt;</code></strong>: اسم الموقع اللي بيظهر فوق في التبويب (Tab) بتاع المتصفح.</li>
+            <li><strong>روابط الخطوط</strong>: بنستدعي خطوط شيك من جوجل (Google Fonts) زي خط <strong>Tajawal</strong> للعربي و <strong>Outfit</strong> للعنجليزي عشان شكل الكلام يبقى احترافي.</li>
+            <li><strong>روابط الأيقونات</strong>: بنستدعي مكتبة اسمها <strong>FontAwesome</strong> عشان تدينا أيقونات شكلها حلو (مثل أيقونة القمر، المطر، سلة المهملات، إلخ).</li>
+        </ul>
+
+        <h3>2. الجسد (<code>&lt;body&gt;</code>)</h3>
+        <p>ده كل حاجة بتشوفها في الشاشة. مقسمينه كالتالي:</p>
+        <ul>
+            <li><strong>مؤثرات الخلفية (<code>bg-glow</code>)</strong>: كرات إضاءة مخفية في الخلفية بتتحرك بشكل ناعم عشان تدي شكل جمالي.</li>
+            <li><strong>رأس الصفحة (<code>&lt;header&gt;</code>)</strong>: فيه اللوجو (ZenFocus) وزرار تبديل المظهر (زرار القمر/الشمس).</li>
+            <li><strong>منطقة العمل الرئيسية (<code>workspace-grid</code>)</strong>: ومقسومة لعمودين:
+                <ul>
+                    <li><strong>العمود الأيمن (المؤقت)</strong>: فيه أزرار اختيار الوضع (تركيز، راحة قصيرة، راحة طويلة)، ورسمة الدائرة (<code>&lt;svg&gt;</code>) اللي بتمثل العداد، وجواها الوقت وحالة العداد، وأزرار التشغيل وإعادة التعيين.</li>
+                    <li><strong>العمود الأيسر (الخدمات)</strong>: فيه لوحة الأصوات (أصوات المطر والنار والمقهى والضوضاء البنية) وملفات الصوت المخفية، وأيضاً قائمة المهام اليومية (حقل الإدخال وزر الإضافة والقائمة الديناميكية).</li>
+                </ul>
+            </li>
+            <li><strong>التذييل (<code>&lt;footer&gt;</code>)</strong>: فيه مربع بيعرض حكمة أو مقولة لتشجيع المستخدم، وجنبها زرار لتغيير المقولة، وساعة بتعرض الوقت الحالي.</li>
+        </ul>
+
+        <h2>الجزء الثاني: البرمجة والتفاعل (JavaScript)</h2>
+        <p>ملف <code>script.js</code> هو اللي بيخلي الأزرار تشتغل ويخلي الموقع "صاحي".</p>
+
+        <h3>1. تخزين البيانات (Variables & State)</h3>
+        <p>أول حاجة بنعرف المتغيرات (زي الصناديق اللي بنحفظ فيها القيم):</p>
+        <ul>
+            <li><code>timerTimeLeft</code>: الوقت المتبقي بالثواني (مثلاً 25 دقيقة = 1500 ثانية).</li>
+            <li><code>timerIsRunning</code>: صندوق قيمته إما صح (True) لو المؤقت شغال، أو غلط (False) لو واقف.</li>
+            <li><code>tasks</code>: قائمة (Array) بنخزن فيها المهام اللي بنكتبها.</li>
+        </ul>
+
+        <h3>2. تشغيل المؤقت (Timer Engine)</h3>
+        <p>لما بتضغط على زرار التشغيل، المتصفح بيشغل دالة مدمجة اسمها <code>setInterval</code>. دي بتشتغل مرة كل ثانية (1000 مللي ثانية). كل ثانية، بننقص من الوقت المتبقي ثانية واحدة، وبنحول الثواني دي لدقائق وثواني شكلها حلو ونعرضها في الشاشة، وبنحدث إطار الدائرة الخضراء.</p>
+
+        <h3>3. توليد الأصوات برمجياً (Web Audio API)</h3>
+        <p>بدل ما ننزل ملف نغمة من النت وممكن ميتشغلش، استخدمنا <strong>Web Audio API</strong> وهو كود بيخلي المتصفح يولّد موجات صوتية حقيقية من الصفر:</p>
+        <ul>
+            <li><strong>دالة <code>playChime()</code></strong>: بنخلي المتصفح يشغل مذبذب موجات (Oscillator) بتردد معين، ويبدأ الصوت عالي ويقل تدريجياً عشان يعمل رنين زي الجرس الهادي.</li>
+            <li><strong>دالة <code>toggleBrownNoise()</code></strong>: بنولد صوت "الضوضاء البنية" (زي صوت هواء الطائرة أو مكيف هادئ جداً) عن طريق توليد أرقام عشوائية ومعالجتها بفلتر لتخفيف الترددات الحادة لتساعد على التركيز الشديد.</li>
+        </ul>
+
+        <h3>4. قائمة المهام و الـ LocalStorage</h3>
+        <p>لما بتكتب مهمة وتضغط <code>+</code>، بنمنع الصفحة إنها تعمل ريفريش، وبناخد الكلام اللي كتبته ونعمل منه كائن (Object) ونضيفه للقائمة وبنحفظه في ذاكرة المتصفح <strong><code>localStorage</code></strong>. الذاكرة دي بتخلي البيانات تفضل محفوظة حتى لو قفلت المتصفح وفتحته تاني.</p>
+
+        <h2>الجزء الثالث: التصميم والجماليات (CSS)</h2>
+        <p>ملف <code>style.css</code> هو المسؤول عن الألوان والخطوط والحركات والتأثيرات الزجاجية الشيك.</p>
+
+        <h3>1. المتغيرات والألوان (CSS Variables)</h3>
+        <p>بنكتب الألوان فوق خالص في الكود عشان نقدر نغيرها بضغطة زرار واحدة (Theme Switcher): بنحدد ألوان الوضع الهادي الفاتح (درجات البيج الكريمي والأخضر الهادي)، والوضع الداكن (Twilight Theme) بمجرد تغيير الكلاس الخاص بالـ body.</p>
+
+        <h3>2. تأثير الزجاج الضبابي (Glassmorphism)</h3>
+        <p>الكروت شكلها عامل زي الزجاج المنقوش، وبنعمل ده بـ 3 سطور سحرية في الـ CSS:</p>
+        <pre>
+background: rgba(255, 255, 255, 0.65); /* لون أبيض شفاف جداً */
+backdrop-filter: blur(16px);            /* السطر ده بيعمل التشويش أو الضباب للخلفية */
+border: 1px solid rgba(255, 255, 255, 0.45); /* إطار أبيض خفيف يحدد الكارت */</pre>
+
+        <h3>3. حركة دائرة الوقت (SVG Stroke-Dash)</h3>
+        <p>الدائرة اللي بتلف حوالين الوقت هي عبارة عن عنصر <code>SVG</code>. بنحدد لها خاصية الإطار ومحيطه، وفي الـ JavaScript، بنغير قيمة الـ <code>stroke-dashoffset</code> بناءً على الوقت المتبقي. لو الوقت في أوله، الإطار كامل؛ وكل ما الوقت يقل، بنخفي جزء من الإطار فيبان كأنه بيقل تدريجياً.</p>
+
+        <div class="highlight-box">
+            <h3>💡 نصائح ذهبية ليوم المناقشة:</h3>
+            <ul>
+                <li>ابتدأ كلامك بـ: <strong>"أنا حبيت أعمل مشروع عملي وهادي، بيساعد الطلاب على التركيز باستخدام تقنية البومودورو، مع دمج أصوات تفاعلية بتساعد على الاسترخاء والتركيز."</strong></li>
+                <li>لما تسألك عن الـ JS، ركز على إنك استخدمت <strong>Web Audio API</strong> لتوليد التنبيهات برمجياً، والـ <strong>LocalStorage</strong> لحفظ المهام في المتصفح.</li>
+                <li>لما تسألك عن الـ CSS، وضح إنك استخدمت <strong>CSS Variables</strong> لتسهيل عمل الـ Dark/Light mode بدون تكرار الكود.</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

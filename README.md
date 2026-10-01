@@ -1,26 +1,35 @@
 # ZenFocus
 
-An Arabic right-to-left productivity web application created as the final project for Front-End Web Development training at the Egyptian Chinese University.
+منصة مذاكرة وإنتاجية: تايمر Pomodoro، مهام، أصوات خلفية، أصحاب ومنافسة، وقريباً غرف بشات وفويس.
+القرارات كلها في [SPEC.md](SPEC.md). النسخة القديمة (HTML/JS) في `legacy/`.
 
-## Features
+## الهيكل
+```
+apps/web        React + Vite (الواجهة)
+apps/api        Fastify + Socket.io + Drizzle (الـ API)
+packages/shared قواعد وأنواع مشتركة (قواعد حساب وقت التركيز هنا)
+```
 
-- Pomodoro timer with focus, short-break, and long-break sessions
-- Circular timer progress indicator and completion alert
-- Ambient sound controls with individual volume settings
-- Browser-generated brown noise using the Web Audio API
-- To-do list with persistent storage in `localStorage`
-- Light and dark themes with saved preferences
-- Rotating motivational quotes and a live local clock
-- Responsive Arabic RTL interface with accessible labels
+## التشغيل محلياً
+```bash
+npm install
+cp apps/api/.env.example apps/api/.env
+npm run dev:api     # http://127.0.0.1:5090 — Postgres مدمج (PGlite) في apps/api/.pglite
+npm run dev:web     # http://localhost:5173
+```
+من غير Google credentials فيه زرار "دخول تجريبي" (`DEV_LOGIN=1`، شغال في التطوير بس).
 
-## Technologies
+## أوامر
+```bash
+npm run typecheck
+npm test                                  # قواعد حساب وقت التركيز
+npm run build
+npm -w @zenfocus/api run db:generate      # بعد أي تعديل في apps/api/src/db/schema.ts
+```
 
-HTML5, CSS3, JavaScript, Web Audio API, Local Storage, responsive design
-
-## Run Locally
-
-Open `index.html` in a modern web browser. An internet connection is needed for the external fonts, icons, and streamed ambient audio files.
-
-## Author
-
-Moustafa Salman Osman Abouelhassan
+## Google OAuth
+Google Cloud Console → APIs & Services → Credentials → OAuth client ID (Web application):
+- Authorized redirect URIs:
+  - `http://localhost:5173/api/auth/google/callback`
+  - `https://zenfocus.datagris.com/api/auth/google/callback`
+- حط `GOOGLE_CLIENT_ID` و`GOOGLE_CLIENT_SECRET` في `apps/api/.env` (الملف ده عمره ما يترفع).
