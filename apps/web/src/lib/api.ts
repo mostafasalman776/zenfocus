@@ -1,5 +1,9 @@
 import type {
+  ChatMessage,
   FocusSession,
+  RoomDetail,
+  RoomSummary,
+  RoomTimer,
   FriendsPayload,
   GuestSessionImport,
   GuestTaskImport,
@@ -21,11 +25,12 @@ export class ApiError extends Error {
 }
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  const isForm = body instanceof FormData;
   const res = await fetch(path, {
     method,
     credentials: 'same-origin',
-    headers: body === undefined ? undefined : { 'content-type': 'application/json' },
-    body: body === undefined ? undefined : JSON.stringify(body)
+    headers: body === undefined || isForm ? undefined : { 'content-type': 'application/json' },
+    body: body === undefined ? undefined : isForm ? body : JSON.stringify(body)
   });
   const data = (await res.json().catch(() => ({}))) as { error?: string };
   if (!res.ok) throw new ApiError(res.status, data.error ?? 'request_failed');
@@ -72,6 +77,49 @@ export const api = {
   block: (userId: string) => request('POST', `/api/blocks/${userId}`),
   leaderboard: (period: LeaderboardPeriod) =>
     request<{ period: LeaderboardPeriod; rows: LeaderboardRow[] }>('GET', `/api/leaderboard?period=${period}`),
+
+  rooms: () => request<{ rooms: RoomSummary[] }>('GET', '/api/rooms'),
+  createRoom: (name: string) => request<{ room: RoomDetail }>('POST', '/api/rooms', { name }),
+  room: (id: string) => request<{ room: RoomDetail }>('GET', `/api/rooms/${id}`),
+  updateRoom: (id: string, patch: { name?: string; focusMinutes?: number; breakMinutes?: number }) =>
+    request<{ room: RoomDetail }>('PATCH', `/api/rooms/${id}`, patch),
+  deleteRoom: (id: string) => request('DELETE', `/api/rooms/${id}`),
+  newRoomInvite: (id: string) => request<{ inviteCode: string }>('POST', `/api/rooms/${id}/invite`),
+  roomInvite: (code: string) =>
+    request<{ roomId: string; name: string; memberCount: number; isMember: boolean; full: boolean }>(
+      'GET',
+      `/api/rooms/invite/${encodeURIComponent(code)}`
+    ),
+  joinRoom: (code: string) => request<{ roomId: string }>('POST', '/api/rooms/join', { code }),
+  leaveRoom: (id: string) => request('POST', `/api/rooms/${id}/leave`),
+  kick: (id: string, userId: string) => request('DELETE', `/api/rooms/${id}/members/${userId}`),
+  roomTimer: (id: string, action: 'start' | 'pause' | 'reset' | 'skip') =>
+    request<{ timer: RoomTimer }>('POST', `/api/rooms/${id}/timer`, { action }),
+  roomLeaderboard: (id: string, period: LeaderboardPeriod) =>
+    request<{ period: LeaderboardPeriod; rows: LeaderboardRow[] }>('GET', `/api/rooms/${id}/leaderboard?period=${period}`),
+  messages: (id: string, before?: string) =>
+    request<{ messages: ChatMessage[] }>(
+      'GET',
+      `/api/rooms/${id}/messages${before ? `?before=${encodeURIComponent(before)}` : ''}`
+    ),
+  sendMessage: (id: string, body: string, replyToId: string | null) =>
+    request<{ message: ChatMessage }>('POST', `/api/rooms/${id}/messages`, { body, replyToId }),
+  sendImage: (id: string, file: Blob, caption: string) => {
+    const form = new FormData();
+    form.append('caption', caption);
+    form.append('file', file, 'image.webp');
+    return request<{ message: ChatMessage }>('POST', `/api/rooms/${id}/images`, form);
+  },
+  editMessage: (id: string, body: string) => request<{ message: ChatMessage }>('PATCH', `/api/messages/${id}`, { body }),
+  deleteMessage: (id: string) => request('DELETE', `/api/messages/${id}`),
+  reportMessage: (id: string, reason: string) => request('POST', `/api/messages/${id}/report`, { reason }),
+  reports: () =>
+    request<{ reports: { id: string; reason: string; createdAt: string; message: ChatMessage | null }[] }>(
+      'GET',
+      '/api/admin/reports'
+    ),
+  resolveReport: (id: string, deleteMessage: boolean) =>
+    request('POST', `/api/admin/reports/${id}/resolve`, { deleteMessage }),
 
   importGuest: (data: { tasks: GuestTaskImport[]; sessions: GuestSessionImport[] }) =>
     request<{ tasks: number; sessions: number }>('POST', '/api/import/guest', data)

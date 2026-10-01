@@ -88,7 +88,7 @@ export function useTasks(me: Me | null): TasksApi {
 
 let socket: Socket | null = null;
 
-function getSocket(): Socket {
+export function getSocket(): Socket {
   if (!socket) socket = io({ path: '/api/socket.io', withCredentials: true });
   return socket;
 }

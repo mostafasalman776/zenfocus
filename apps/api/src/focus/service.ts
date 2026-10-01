@@ -192,13 +192,14 @@ export async function end(userId: string, reason: 'completed' | 'stopped') {
 }
 
 /** Close sessions nobody came back to. Runs on an interval. */
-export async function sweep(): Promise<number> {
+/** Returns the users whose session was closed. */
+export async function sweep(): Promise<string[]> {
   const now = Date.now();
   const open = await db.select().from(schema.focusSessions).where(ne(schema.focusSessions.status, 'ended'));
-  let closed = 0;
+  const closed: string[] = [];
   for (const row of open) {
     const reason = sweepReason(clock(row), now);
-    if (reason && (await finalize(row, now, reason))) closed++;
+    if (reason && (await finalize(row, now, reason))) closed.push(row.userId);
   }
   return closed;
 }

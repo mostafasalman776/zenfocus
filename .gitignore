@@ -6,3 +6,5 @@ dist/
 *.log
 apps/api/.pglite/
 apps/api/uploads/
+.DS_Store
+Thumbs.db

@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -9,7 +10,14 @@ const schema = z.object({
   PGLITE_DIR: z.string().default('./.pglite'),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
-  DEV_LOGIN: z.string().optional()
+  DEV_LOGIN: z.string().optional(),
+  UPLOAD_DIR: z.string().default('./uploads'),
+  /** HMAC key for signed image URLs. */
+  IMAGE_SECRET: z.preprocess((v) => v || undefined, z.string().min(32).optional()),
+  /** When set (e.g. /_zf_uploads/), images are served by Nginx via X-Accel-Redirect. */
+  ACCEL_REDIRECT_PREFIX: z.string().optional(),
+  /** Comma-separated usernames allowed to review reports. */
+  ADMIN_USERNAMES: z.string().default('')
 });
 
 const parsed = schema.parse(process.env);
@@ -18,9 +26,14 @@ export const env = {
   ...parsed,
   isProd: parsed.NODE_ENV === 'production',
   devLogin: parsed.NODE_ENV !== 'production' && parsed.DEV_LOGIN === '1',
-  googleEnabled: Boolean(parsed.GOOGLE_CLIENT_ID && parsed.GOOGLE_CLIENT_SECRET)
+  googleEnabled: Boolean(parsed.GOOGLE_CLIENT_ID && parsed.GOOGLE_CLIENT_SECRET),
+  imageSecret: parsed.IMAGE_SECRET ?? randomBytes(32).toString('hex'),
+  admins: new Set(
+    parsed.ADMIN_USERNAMES.split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean)
+  )
 };
 
-if (env.isProd && !env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is required in production');
-}
+if (env.isProd && !env.DATABASE_URL) throw new Error('DATABASE_URL is required in production');
+if (env.isProd && !parsed.IMAGE_SECRET) throw new Error('IMAGE_SECRET is required in production');

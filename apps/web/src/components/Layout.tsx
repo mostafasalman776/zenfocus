@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { api } from '../lib/api';
 import { loadInvite, loadPref, savePref } from '../lib/guest';
 import { useMe, useTimerEngine } from '../lib/hooks';
+import { usePendingRoomRedirect } from '../pages/RoomsPage';
 import { useTimer } from '../stores/timer';
 import { Avatar, Icon, type IconName } from './Icon';
 
@@ -89,6 +90,7 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   useTimerEngine(me);
+  usePendingRoomRedirect();
 
   // New accounts pick a username before anything else.
   useEffect(() => {
@@ -119,6 +121,12 @@ export function Layout() {
               {item.locked && <Icon name="lock" size={14} label="محتاج تسجيل" style={{ marginInlineStart: 'auto', color: 'var(--warm)' }} />}
             </NavLink>
           ))}
+          {me?.isAdmin && (
+            <NavLink to="/admin">
+              <Icon name="flag" />
+              البلاغات
+            </NavLink>
+          )}
         </nav>
         <div className="side-spacer" />
         {me ? (

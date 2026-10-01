@@ -35,6 +35,8 @@ interface TimerState {
   setMode: (mode: TimerMode) => void;
   setTask: (taskId: string | null) => void;
   start: (signedIn: boolean) => Promise<void>;
+  /** Start a focus run of a specific length (used to follow a room timer). */
+  startFor: (seconds: number, signedIn: boolean) => Promise<void>;
   pause: () => Promise<void>;
   resume: () => Promise<void>;
   stop: () => Promise<void>;
@@ -150,6 +152,12 @@ export const useTimer = create<TimerState>((set, get) => {
         tracked: false,
         guestStartedAt: s.mode === 'focus' ? Date.now() : null
       });
+    },
+
+    async startFor(seconds, signedIn) {
+      if (get().status !== 'idle') return;
+      set({ mode: 'focus', remaining: seconds });
+      await get().start(signedIn);
     },
 
     async pause() {

@@ -6,13 +6,16 @@ import { SESSION_COOKIE, userFromToken } from './auth/session.js';
 import { closeDb, runMigrations } from './db/index.js';
 import { env } from './env.js';
 import { SWEEP_INTERVAL_MS, sweep } from './focus/service.js';
+import { setFocusState } from './realtime/hub.js';
 import { attachRealtime } from './realtime/socket.js';
 import { authRoutes } from './routes/auth.js';
 import { focusRoutes } from './routes/focus.js';
 import { friendRoutes } from './routes/friends.js';
 import { importRoutes } from './routes/import.js';
 import { meRoutes } from './routes/me.js';
+import { roomRoutes } from './routes/rooms.js';
 import { taskRoutes } from './routes/tasks.js';
+import { purgeExpiredImages } from './rooms/images.js';
 
 const app = Fastify({
   logger: { level: env.isProd ? 'info' : 'debug' },
@@ -44,18 +47,29 @@ await app.register(taskRoutes);
 await app.register(focusRoutes);
 await app.register(friendRoutes);
 await app.register(importRoutes);
+await app.register(roomRoutes);
 
 await runMigrations();
 attachRealtime(app);
 
 const sweeper = setInterval(() => {
   sweep()
-    .then((n) => n && app.log.info({ closed: n }, 'swept focus sessions'))
+    .then((users) => {
+      for (const id of users) setFocusState(id, null);
+      if (users.length) app.log.info({ closed: users.length }, 'swept focus sessions');
+    })
     .catch((err) => app.log.error({ err }, 'sweep failed'));
 }, SWEEP_INTERVAL_MS);
 
+const imagePurge = setInterval(() => {
+  purgeExpiredImages()
+    .then((n) => n && app.log.info({ deleted: n }, 'purged expired images'))
+    .catch((err) => app.log.error({ err }, 'image purge failed'));
+}, 60 * 60_000);
+
 async function shutdown() {
   clearInterval(sweeper);
+  clearInterval(imagePurge);
   await app.close();
   await closeDb();
   process.exit(0);
