@@ -1,4 +1,4 @@
-import { USERNAME_RE, type FriendSummary, type FriendsPayload, type LeaderboardPeriod } from '@zenfocus/shared';
+import { ADMIN_USERNAME_RE, type FriendSummary, type FriendsPayload, type LeaderboardPeriod } from '@zenfocus/shared';
 import { and, eq, inArray, or } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
@@ -52,7 +52,7 @@ export async function friendRoutes(app: FastifyInstance) {
   app.post('/api/friends/requests', async (request, reply) => {
     const me = currentUser(request);
     const { username } = z
-      .object({ username: z.string().trim().toLowerCase().transform((s) => s.replace(/^@/, '')).pipe(z.string().regex(USERNAME_RE)) })
+      .object({ username: z.string().trim().toLowerCase().transform((s) => s.replace(/^@/, '')).pipe(z.string().regex(ADMIN_USERNAME_RE)) })
       .parse(request.body);
     const [target] = await db.select({ id: u.id }).from(u).where(eq(u.username, username)).limit(1);
     // Same answer for "no such user" and "blocked" so blocks stay private.

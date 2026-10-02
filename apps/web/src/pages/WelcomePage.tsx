@@ -1,4 +1,4 @@
-import { USERNAME_RE } from '@zenfocus/shared';
+import { ADMIN_USERNAME_RE, USERNAME_RE } from '@zenfocus/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router';
@@ -16,14 +16,14 @@ export function WelcomePage() {
   const { me, loading } = useMe();
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const [username, setUsername] = useState(() => (me ? suggest(me.name) : ''));
+  const [username, setUsername] = useState(() => (me ? (me.username ?? suggest(me.name)) : ''));
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const guestData = hasGuestData();
 
   // `me` may arrive after the first render; prefill once it does.
   useEffect(() => {
-    if (me) setUsername((u) => u || suggest(me.name));
+    if (me) setUsername((u) => u || (me.username ?? suggest(me.name)));
   }, [me]);
 
   if (loading) return null;
@@ -32,7 +32,7 @@ export function WelcomePage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const value = username.trim().toLowerCase();
-    if (!USERNAME_RE.test(value)) {
+    if (!(me.isAdmin ? ADMIN_USERNAME_RE : USERNAME_RE).test(value)) {
       setError('من 3 إلى 20 حرفًا: أحرف إنجليزية صغيرة وأرقام و _ فقط');
       return;
     }
@@ -56,7 +56,13 @@ export function WelcomePage() {
       await qc.invalidateQueries();
       navigate('/');
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 409 ? 'اسم المستخدم مستخدم بالفعل' : 'حدث خطأ، حاول مرة أخرى');
+      setError(
+        err instanceof ApiError && err.status === 409
+          ? 'اسم المستخدم مستخدم بالفعل'
+          : err instanceof ApiError && err.code === 'username_short'
+            ? 'من 3 إلى 20 حرفًا: أحرف إنجليزية صغيرة وأرقام و _ فقط'
+            : 'حدث خطأ، حاول مرة أخرى'
+      );
     } finally {
       setBusy(false);
     }
@@ -69,8 +75,8 @@ export function WelcomePage() {
           <Icon name="feather" size={26} />
           <span>ZenFocus</span>
         </span>
-        <h1 style={{ fontSize: 24 }}>مرحبًا، {me.name.split(' ')[0]}</h1>
-        <p className="muted">اختر اسم مستخدم.</p>
+        <h1 style={{ fontSize: 24 }}>{me.username ? 'اسم المستخدم' : `مرحبًا، ${me.name.split(' ')[0]}`}</h1>
+        <p className="muted">{me.username ? 'اختر اسمًا جديدًا.' : 'اختر اسم مستخدم.'}</p>
         <div className="field">
           <label htmlFor="username">اسم المستخدم</label>
           <div className="prefix">

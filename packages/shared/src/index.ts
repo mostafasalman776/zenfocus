@@ -36,6 +36,8 @@ export const LIMITS = {
 } as const;
 
 export const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
+/** Admins may also take two-character usernames. */
+export const ADMIN_USERNAME_RE = /^[a-z0-9_]{2,20}$/;
 
 export type TimerMode = 'focus' | 'short' | 'long';
 

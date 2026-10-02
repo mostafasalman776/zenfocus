@@ -146,7 +146,9 @@ export function Layout() {
             <Avatar name={me.name} src={me.avatarUrl} id={me.id} />
             <div className="who">
               <b>{me.name}</b>
-              {me.username && <span dir="ltr">@{me.username}</span>}
+              <NavLink to="/welcome" className="who-username" title="تغيير اسم المستخدم" dir="ltr">
+                {me.username ? `@${me.username}` : 'اختر اسم مستخدم'}
+              </NavLink>
             </div>
             <button type="button" className="icon-btn" aria-label="تسجيل الخروج" onClick={logout}>
               <Icon name="logout" size={18} />
@@ -194,6 +196,7 @@ export function Layout() {
             <div className="account-links">
               <NavLink to="/privacy" onClick={() => setAccountOpen(false)}>سياسة الخصوصية</NavLink>
               <NavLink to="/terms" onClick={() => setAccountOpen(false)}>شروط الاستخدام</NavLink>
+              <NavLink to="/welcome" onClick={() => setAccountOpen(false)}>تغيير اسم المستخدم</NavLink>
               {me.isAdmin && <NavLink to="/admin" onClick={() => setAccountOpen(false)}>لوحة التحكم</NavLink>}
             </div>
             <button type="button" className="btn danger" onClick={() => { setAccountOpen(false); void logout(); }}>

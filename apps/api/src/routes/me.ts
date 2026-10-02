@@ -1,4 +1,5 @@
 import {
+  ADMIN_USERNAME_RE,
   USERNAME_RE,
   addDays,
   cairoDay,
@@ -13,7 +14,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { currentUser, requireUser, type User } from '../auth/session.js';
 import { db, schema, tzSql } from '../db/index.js';
-import { isAdminUser } from '../env.js';
+import { env, isAdminUser } from '../env.js';
 import { dailyTotals, leaderboard } from '../lib/aggregates.js';
 import { friendIds } from '../lib/friends.js';
 
@@ -35,12 +36,17 @@ export async function meRoutes(app: FastifyInstance) {
     const user = currentUser(request);
     const body = z
       .object({
-        username: z.string().trim().toLowerCase().regex(USERNAME_RE).optional(),
+        username: z.string().trim().toLowerCase().regex(ADMIN_USERNAME_RE).optional(),
         name: z.string().trim().min(1).max(40).optional(),
         dailyGoalSeconds: z.number().int().min(15 * 60).max(16 * 3600).optional()
       })
       .parse(request.body);
     if (body.username && body.username !== user.username) {
+      // Admin usernames are reserved: only an account that is already an admin
+      // (by email or current username) can claim one, and only admins get 2-char names.
+      const admin = isAdminUser(user);
+      if (!admin && !USERNAME_RE.test(body.username)) return reply.code(400).send({ error: 'username_short' });
+      if (!admin && env.admins.has(body.username)) return reply.code(409).send({ error: 'username_taken' });
       const taken = await db
         .select({ id: schema.users.id })
         .from(schema.users)
