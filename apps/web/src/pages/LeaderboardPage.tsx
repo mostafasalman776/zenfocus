@@ -8,7 +8,7 @@ import { useMe } from '../lib/hooks';
 import { RequireAccount } from './RequireAccount';
 
 const PERIODS: { id: LeaderboardPeriod; label: string }[] = [
-  { id: 'week', label: 'الأسبوع ده' },
+  { id: 'week', label: 'هذا الأسبوع' },
   { id: 'month', label: 'الشهر' },
   { id: 'all', label: 'كل الوقت' }
 ];
@@ -21,7 +21,7 @@ function Place({ row, rank }: { row: LeaderboardRow; rank: number }) {
       <b>{row.isMe ? 'أنت' : row.name}</b>
       <span className="hours">{formatDuration(row.seconds)}</span>
       <span className="muted" style={{ fontSize: 12 }}>
-        {row.sessions} جلسة{row.streak ? ` · ${row.streak} يوم ستريك` : ''}
+        {row.sessions} جلسة{row.streak ? ` · ${row.streak} أيام متتالية` : ''}
       </span>
     </div>
   );
@@ -42,18 +42,18 @@ function Friends() {
     mutationFn: api.requestFriend,
     onSuccess: (r) => {
       setUsername('');
-      setMsg(r.status === 'requested' ? 'اتبعت الطلب' : r.status === 'friends' ? 'بقيتوا أصحاب' : 'إنتوا أصحاب أصلاً');
+      setMsg(r.status === 'requested' ? 'تم إرسال الطلب' : r.status === 'friends' ? 'أصبحتما صديقين' : 'أنتما صديقان بالفعل');
       refresh();
     },
-    onError: (e) => setMsg(e instanceof ApiError && e.status === 404 ? 'مفيش حد بالاسم ده' : 'حصلت مشكلة، جرّب تاني')
+    onError: (e) => setMsg(e instanceof ApiError && e.status === 404 ? 'لا يوجد مستخدم بهذا الاسم' : 'حدث خطأ، حاول مرة أخرى')
   });
   const inviteUrl = me ? `${location.origin}/invite/${me.inviteCode}` : '';
 
   return (
     <div className="side-cards">
-      <section className="card" aria-label="ضيف صاحب">
+      <section className="card" aria-label="إضافة صديق">
         <div className="card-head">
-          <h2>ضيف صحابك</h2>
+          <h2>إضافة صديق</h2>
         </div>
         <form
           className="task-form"
@@ -85,7 +85,7 @@ function Friends() {
           </p>
         )}
         <p className="muted" style={{ fontSize: 13, margin: '6px 0 8px' }}>
-          أو ابعت اللينك ده، واللي يسجل منه يبقى صاحبك على طول
+          أو شارك رابط الدعوة
         </p>
         <div style={{ display: 'flex', gap: 8 }}>
           <span className="code">{me?.inviteCode}</span>
@@ -100,7 +100,7 @@ function Friends() {
             }}
           >
             <Icon name="copy" size={18} />
-            {copied ? 'اتنسخ' : 'نسخ اللينك'}
+            {copied ? 'تم النسخ' : 'نسخ الرابط'}
           </button>
         </div>
       </section>
@@ -108,7 +108,7 @@ function Friends() {
       {Boolean(friends.data?.incoming.length) && (
         <section className="card" aria-label="طلبات الصداقة">
           <div className="card-head">
-            <h2>طلبات جاية</h2>
+            <h2>طلبات الصداقة</h2>
           </div>
           {friends.data!.incoming.map((f) => (
             <div className="person" key={f.requestId}>
@@ -128,9 +128,9 @@ function Friends() {
         </section>
       )}
 
-      <section className="card" aria-label="أصحابي">
+      <section className="card" aria-label="الأصدقاء">
         <div className="card-head">
-          <h2>أصحابي</h2>
+          <h2>الأصدقاء</h2>
           <span className="num muted">{friends.data?.friends.length ?? 0}</span>
         </div>
         {friends.data?.friends.length ? (
@@ -144,25 +144,25 @@ function Friends() {
               <button
                 type="button"
                 className="btn sm ghost"
-                onClick={() => window.confirm(`تشيل ${f.name} من أصحابك؟`) && api.unfriend(f.userId).then(refresh)}
+                onClick={() => window.confirm(`إزالة ${f.name} من الأصدقاء؟`) && api.unfriend(f.userId).then(refresh)}
               >
                 إزالة
               </button>
               <button
                 type="button"
                 className="btn sm danger"
-                onClick={() => window.confirm(`تعمل بلوك لـ ${f.name}؟ مش هيقدر يبعتلك طلبات تاني.`) && api.block(f.userId).then(refresh)}
+                onClick={() => window.confirm(`حظر ${f.name}؟`) && api.block(f.userId).then(refresh)}
               >
-                بلوك
+                حظر
               </button>
             </div>
           ))
         ) : (
-          <p className="empty">لسه مفيش أصحاب. ابعت لينك الدعوة لصحابك.</p>
+          <p className="empty">لا يوجد أصدقاء بعد.</p>
         )}
         {Boolean(friends.data?.outgoing.length) && (
           <p className="muted" style={{ fontSize: 13, marginTop: 8 }}>
-            مستني رد: {friends.data!.outgoing.map((f) => `@${f.username}`).join('، ')}
+            بانتظار الرد: {friends.data!.outgoing.map((f) => `@${f.username}`).join('، ')}
           </p>
         )}
       </section>
@@ -184,7 +184,6 @@ function Board() {
       <header className="page-head">
         <div>
           <h1>المنافسة</h1>
-          <p>الترتيب بساعات التركيز الحقيقية من التايمر · الأسبوع بيبدأ السبت</p>
         </div>
         <div className="segmented" role="tablist" aria-label="الفترة">
           {PERIODS.map((p) => (
@@ -202,8 +201,8 @@ function Board() {
               <span className="empty-icon">
                 <Icon name="trophy" size={30} />
               </span>
-              <h2>المنافسة أحلى مع صحابك</h2>
-              <p>ابعت لينك الدعوة اللي على الجنب لصحابك. أول ما حد يسجل منه هتلاقوا نفسكم في نفس الترتيب، وكل دقيقة تركيز بتفرق.</p>
+              <h2>نافس أصدقاءك</h2>
+              <p>شارك رابط الدعوة مع أصدقائك لتظهروا معًا في الترتيب.</p>
             </section>
           )}
           {rows.length > 1 && (
@@ -221,12 +220,12 @@ function Board() {
               <span style={{ flex: '1 1 200px' }}>
                 {ahead ? (
                   <>
-                    محتاج <b style={{ color: 'var(--warm)' }}>{formatDuration(gap + 60)}</b> كمان وتعدّي {ahead.name}.
+                    تحتاج <b style={{ color: 'var(--warm)' }}>{formatDuration(gap + 60)}</b> لتتجاوز {ahead.name}.
                   </>
                 ) : rows.length > 1 ? (
-                  'إنت الأول. حافظ على مكانك.'
+                  'أنت في المركز الأول.'
                 ) : (
-                  'ضيف صحابك عشان المنافسة تبدأ.'
+                  'أضف أصدقاءك لبدء المنافسة.'
                 )}
               </span>
               <Link className="btn" to="/">
@@ -241,7 +240,7 @@ function Board() {
               <span>الاسم</span>
               <span>ساعات التركيز</span>
               <span className="opt">الجلسات</span>
-              <span className="opt">الستريك</span>
+              <span className="opt">أيام متتالية</span>
             </div>
             {rows.map((r, i) => (
               <div key={r.userId} className={`board-row${r.isMe ? ' me' : ''}`}>
@@ -253,7 +252,7 @@ function Board() {
                 <span className="num">{formatDuration(r.seconds)}</span>
                 <span className="num opt muted">{r.sessions}</span>
                 <span className="opt" style={{ color: 'var(--warm)', fontSize: 13 }}>
-                  {r.streak ? `${r.streak} يوم` : '—'}
+                  {r.streak ? `${r.streak} أيام` : '—'}
                 </span>
               </div>
             ))}
@@ -268,7 +267,7 @@ function Board() {
 
 export function LeaderboardPage() {
   return (
-    <RequireAccount what="المنافسة مع صحابك">
+    <RequireAccount what="المنافسة">
       <Board />
     </RequireAccount>
   );

@@ -19,10 +19,10 @@ import { useTimer } from '../stores/timer';
 import { RequireAccount } from './RequireAccount';
 
 const STATUS: Record<PresenceStatus, { label: string; cls: string }> = {
-  focus: { label: 'بيذاكر', cls: 'st-focus' },
+  focus: { label: 'يركّز', cls: 'st-focus' },
   paused: { label: 'متوقف مؤقتاً', cls: 'st-paused' },
   online: { label: 'متصل', cls: 'st-online' },
-  offline: { label: 'مش متصل', cls: 'st-offline' }
+  offline: { label: 'غير متصل', cls: 'st-offline' }
 };
 
 const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
@@ -74,11 +74,11 @@ function TimerBar({ room, follow, setFollow }: { room: RoomDetail; follow: boole
       <div style={{ flex: '1 1 220px', display: 'flex', flexDirection: 'column', gap: 8 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <span style={{ fontWeight: 600, color: p.phase === 'focus' ? 'var(--accent-hover)' : 'var(--warm)' }}>
-            {p.phase === 'focus' ? 'تركيز' : 'بريك'} · الجولة {p.round}
-            {!room.timer.running && ' · واقف'}
+            {p.phase === 'focus' ? 'تركيز' : 'استراحة'} · الجولة {p.round}
+            {!room.timer.running && ' · متوقف'}
           </span>
           <span className="muted">
-            {room.timer.focusMinutes}د تركيز / {room.timer.breakMinutes}د بريك
+            {room.timer.focusMinutes} د تركيز / {room.timer.breakMinutes} د استراحة
           </span>
         </div>
         <div className="bar" style={{ height: 8 }}>
@@ -97,7 +97,7 @@ function TimerBar({ room, follow, setFollow }: { room: RoomDetail; follow: boole
                 <Icon name="play" style={{ transform: 'scaleX(-1)' }} />
               </button>
             )}
-            <button type="button" className="icon-btn" aria-label="المرحلة الجاية" onClick={act('skip')}>
+            <button type="button" className="icon-btn" aria-label="المرحلة التالية" onClick={act('skip')}>
               <Icon name="skip" style={{ transform: 'scaleX(-1)' }} />
             </button>
             <button type="button" className="icon-btn" aria-label="تصفير تايمر الغرفة" onClick={act('reset')}>
@@ -107,7 +107,7 @@ function TimerBar({ room, follow, setFollow }: { room: RoomDetail; follow: boole
         )}
         <button type="button" className="toggle" aria-pressed={follow} onClick={() => setFollow(!follow)}>
           <span className="knob" />
-          ذاكر مع الغرفة
+          المتابعة مع الغرفة
         </button>
       </div>
     </section>
@@ -144,8 +144,8 @@ function Members({ room, meId }: { room: RoomDetail; meId: string }) {
                   type="button"
                   className="del"
                   style={{ opacity: 1 }}
-                  aria-label={`طرد ${m.name}`}
-                  onClick={() => window.confirm(`تطرد ${m.name} من الغرفة؟`) && void api.kick(room.id, m.userId)}
+                  aria-label={`إزالة ${m.name}`}
+                  onClick={() => window.confirm(`إزالة ${m.name} من الغرفة؟`) && void api.kick(room.id, m.userId)}
                 >
                   <Icon name="x" size={16} />
                 </button>
@@ -154,7 +154,7 @@ function Members({ room, meId }: { room: RoomDetail; meId: string }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span className={`status-chip ${STATUS[m.status].cls}`}>{STATUS[m.status].label}</span>
               <span className="num muted" style={{ fontSize: 13 }}>
-                النهارده {formatDuration(m.todaySeconds)}
+                اليوم {formatDuration(m.todaySeconds)}
               </span>
             </div>
           </article>
@@ -269,7 +269,7 @@ function Room({ id }: { id: string }) {
   if (roomQ.isError) {
     return (
       <section className="card" style={{ maxWidth: 480, margin: '10vh auto 0', textAlign: 'center', padding: 32 }}>
-        <h1 style={{ fontSize: 22 }}>الغرفة دي مش موجودة أو إنت مش عضو فيها</h1>
+        <h1 style={{ fontSize: 22 }}>الغرفة غير موجودة أو لست عضوًا فيها</h1>
       </section>
     );
   }
@@ -285,17 +285,17 @@ function Room({ id }: { id: string }) {
           <div>
             <h1>{room.name}</h1>
             <p>
-              {room.memberCount} أعضاء · {focusing} بيذاكروا دلوقتي
+              {room.memberCount} أعضاء · {focusing} يركّزون الآن
             </p>
           </div>
           <div className="head-actions">
             <button
               type="button"
               className="btn ghost"
-              onClick={() => void navigator.clipboard?.writeText(inviteUrl).then(() => window.alert('اتنسخ لينك الدعوة'))}
+              onClick={() => void navigator.clipboard?.writeText(inviteUrl).then(() => window.alert('تم نسخ رابط الدعوة'))}
             >
               <Icon name="userPlus" size={18} />
-              لينك الدعوة
+              رابط الدعوة
             </button>
             {room.role === 'owner' ? (
               <button
@@ -305,15 +305,15 @@ function Room({ id }: { id: string }) {
                 onClick={async () => {
                   const name = window.prompt('اسم الغرفة', room.name);
                   if (name === null) return;
-                  const focus = Number(window.prompt('دقايق التركيز في تايمر الغرفة', String(room.timer.focusMinutes)));
-                  const brk = Number(window.prompt('دقايق البريك', String(room.timer.breakMinutes)));
+                  const focus = Number(window.prompt('مدة التركيز (بالدقائق)', String(room.timer.focusMinutes)));
+                  const brk = Number(window.prompt('مدة الاستراحة (بالدقائق)', String(room.timer.breakMinutes)));
                   await api
                     .updateRoom(room.id, {
                       name: name.trim() || room.name,
                       ...(focus >= 5 && focus <= 180 ? { focusMinutes: focus } : {}),
                       ...(brk >= 1 && brk <= 60 ? { breakMinutes: brk } : {})
                     })
-                    .catch(() => window.alert('معرفناش نحفظ'));
+                    .catch(() => window.alert('تعذّر الحفظ'));
                 }}
               >
                 <Icon name="settings" />
@@ -322,9 +322,9 @@ function Room({ id }: { id: string }) {
               <button
                 type="button"
                 className="btn ghost"
-                onClick={() => window.confirm('تخرج من الغرفة؟') && void api.leaveRoom(room.id).then(() => navigate('/rooms'))}
+                onClick={() => window.confirm('مغادرة الغرفة؟') && void api.leaveRoom(room.id).then(() => navigate('/rooms'))}
               >
-                خروج
+                مغادرة
               </button>
             )}
           </div>
@@ -333,7 +333,7 @@ function Room({ id }: { id: string }) {
         <VoiceBar roomId={room.id} />
         <div className="segmented room-tabs" role="tablist">
           <button type="button" role="tab" aria-selected={tab === 'chat'} onClick={() => setTab('chat')}>
-            الشات
+            المحادثة
           </button>
           <button type="button" role="tab" aria-selected={tab === 'members'} onClick={() => setTab('members')}>
             الأعضاء

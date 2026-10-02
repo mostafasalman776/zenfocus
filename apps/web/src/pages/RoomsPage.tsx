@@ -20,7 +20,7 @@ function RoomList() {
       navigate(`/rooms/${room.id}`);
     },
     onError: (e) =>
-      setError(e instanceof ApiError && e.code === 'too_many_rooms' ? `الحد الأقصى ${ROOM_RULES.maxOwnedRooms} غرف` : 'حصلت مشكلة')
+      setError(e instanceof ApiError && e.code === 'too_many_rooms' ? `الحد الأقصى ${ROOM_RULES.maxOwnedRooms} غرف` : 'حدث خطأ')
   });
 
   return (
@@ -28,7 +28,6 @@ function RoomList() {
       <header className="page-head">
         <div>
           <h1>الغرف</h1>
-          <p>ذاكروا سوا بتايمر واحد وشات. الغرف خاصة والدخول بلينك دعوة.</p>
         </div>
       </header>
       <div className="cols" style={{ gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 360px)' }}>
@@ -50,7 +49,7 @@ function RoomList() {
               ))}
             </div>
           ) : (
-            <p className="empty">لسه مش في أي غرفة. اعمل غرفة وابعت اللينك لصحابك، أو افتح لينك دعوة.</p>
+            <p className="empty">لا توجد غرف بعد.</p>
           )}
         </section>
         <section className="card" aria-label="غرفة جديدة">
@@ -71,7 +70,7 @@ function RoomList() {
             <input
               id="room-name"
               className="input"
-              placeholder="مثلاً: فيزياء — تالتة ثانوي"
+              placeholder="اسم الغرفة"
               maxLength={ROOM_RULES.nameMax}
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -128,8 +127,8 @@ export function JoinRoomPage() {
   if (invite.isError) {
     return (
       <section className="card" style={{ maxWidth: 480, margin: '10vh auto 0', textAlign: 'center', padding: 32 }}>
-        <h1 style={{ fontSize: 22 }}>اللينك ده مش شغال</h1>
-        <p className="muted">ممكن يكون صاحب الغرفة غيّره. اطلب لينك جديد.</p>
+        <h1 style={{ fontSize: 22 }}>رابط الدعوة غير صالح</h1>
+        <p className="muted">اطلب رابطًا جديدًا من صاحب الغرفة.</p>
       </section>
     );
   }
@@ -143,7 +142,7 @@ export function JoinRoomPage() {
         {d.memberCount} {d.memberCount === 1 ? 'عضو' : 'أعضاء'}
       </p>
       {d.full ? (
-        <p style={{ color: 'var(--danger)' }}>الغرفة مليانة ({ROOM_RULES.maxMembers} عضو)</p>
+        <p style={{ color: 'var(--danger)' }}>الغرفة ممتلئة ({ROOM_RULES.maxMembers} عضو)</p>
       ) : (
         <button
           type="button"
@@ -154,11 +153,11 @@ export function JoinRoomPage() {
               await qc.invalidateQueries({ queryKey: ['rooms'] });
               navigate(`/rooms/${r.roomId}`, { replace: true });
             } catch {
-              setError('معرفناش ندخلك، جرّب تاني');
+              setError('تعذّر الانضمام، حاول مرة أخرى');
             }
           }}
         >
-          ادخل الغرفة
+          انضمام
         </button>
       )}
       {error && <p role="alert" style={{ color: 'var(--danger)' }}>{error}</p>}

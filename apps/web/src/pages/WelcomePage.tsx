@@ -33,7 +33,7 @@ export function WelcomePage() {
     e.preventDefault();
     const value = username.trim().toLowerCase();
     if (!USERNAME_RE.test(value)) {
-      setError('من 3 لـ 20 حرف: حروف إنجليزي صغيرة وأرقام و _ بس');
+      setError('من 3 إلى 20 حرفًا: أحرف إنجليزية صغيرة وأرقام و _ فقط');
       return;
     }
     setBusy(true);
@@ -56,7 +56,7 @@ export function WelcomePage() {
       await qc.invalidateQueries();
       navigate('/');
     } catch (err) {
-      setError(err instanceof ApiError && err.status === 409 ? 'الاسم ده متاخد، جرّب غيره' : 'حصلت مشكلة، جرّب تاني');
+      setError(err instanceof ApiError && err.status === 409 ? 'اسم المستخدم مستخدم بالفعل' : 'حدث خطأ، حاول مرة أخرى');
     } finally {
       setBusy(false);
     }
@@ -69,8 +69,8 @@ export function WelcomePage() {
           <Icon name="feather" size={26} />
           <span>ZenFocus</span>
         </span>
-        <h1 style={{ fontSize: 24 }}>أهلاً يا {me.name.split(' ')[0]}</h1>
-        <p className="muted">اختار اسم مستخدم، صحابك هيضيفوك بيه.</p>
+        <h1 style={{ fontSize: 24 }}>مرحبًا، {me.name.split(' ')[0]}</h1>
+        <p className="muted">اختر اسم مستخدم.</p>
         <div className="field">
           <label htmlFor="username">اسم المستخدم</label>
           <div className="prefix">
@@ -86,7 +86,7 @@ export function WelcomePage() {
             />
           </div>
           <span id="username-hint" className="hint">
-            حروف إنجليزي صغيرة وأرقام و _ ، من 3 لـ 20 حرف
+            أحرف إنجليزية صغيرة وأرقام و _ (من 3 إلى 20)
           </span>
           {error && (
             <span className="error" role="alert">
@@ -96,11 +96,11 @@ export function WelcomePage() {
         </div>
         {guestData && (
           <p className="muted" style={{ fontSize: 14 }}>
-            المهام والجلسات اللي عملتها كزائر هتتنقل لحسابك.
+            سيتم نقل مهامك وجلساتك السابقة إلى حسابك.
           </p>
         )}
         <button type="submit" className="btn" disabled={busy}>
-          يلا نبدأ
+          متابعة
         </button>
       </form>
     </div>

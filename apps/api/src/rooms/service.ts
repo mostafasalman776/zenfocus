@@ -101,7 +101,7 @@ function toMessage(r: MessageRow): ChatMessage {
   const deleted = Boolean(r.msg.deletedAt);
   const replyBody = r.reply
     ? r.reply.deletedAt
-      ? 'رسالة اتمسحت'
+      ? 'رسالة محذوفة'
       : r.reply.kind === 'image'
         ? 'صورة'
         : r.reply.body.slice(0, 120)

@@ -79,9 +79,9 @@ export function VoiceBar({ roomId }: { roomId: string }) {
       setState('connected');
     } catch (err) {
       leave();
-      if (err instanceof ApiError && err.code === 'voice_disabled') setError('الفويس لسه مش متفعّل على السيرفر');
-      else if (err instanceof DOMException && err.name === 'NotAllowedError') setError('لازم تسمح للموقع يستخدم المايك');
-      else setError('معرفناش نوصلك بالفويس، جرّب تاني');
+      if (err instanceof ApiError && err.code === 'voice_disabled') setError('المحادثة الصوتية غير مفعّلة');
+      else if (err instanceof DOMException && err.name === 'NotAllowedError') setError('يجب السماح باستخدام الميكروفون');
+      else setError('تعذّر الاتصال، حاول مرة أخرى');
     }
   };
 
@@ -94,15 +94,15 @@ export function VoiceBar({ roomId }: { roomId: string }) {
   };
 
   return (
-    <section className="card voice" aria-label="الفويس">
+    <section className="card voice" aria-label="المحادثة الصوتية">
       <div ref={audioBox} hidden />
       <span className={`voice-dot${state === 'connected' ? ' on' : ''}`} aria-hidden="true" />
       <div className="voice-info">
-        <b>{state === 'connected' ? 'متصل بالفويس' : 'الفويس'}</b>
+        <b>{state === 'connected' ? 'متصل بالمحادثة الصوتية' : 'المحادثة الصوتية'}</b>
         <span className="muted">
           {state === 'connected'
-            ? `${people.length} في المكالمة${people.some((p) => p.speaking) ? ` · ${people.filter((p) => p.speaking).map((p) => p.name).join('، ')} بيتكلم` : ''}`
-            : error ?? 'صوت بس، من غير كاميرا'}
+            ? `${people.length} مشاركين${people.some((p) => p.speaking) ? ` · يتحدث: ${people.filter((p) => p.speaking).map((p) => p.name).join('، ')}` : ''}`
+            : error ?? ''}
         </span>
       </div>
       {state === 'connected' && (
@@ -112,7 +112,7 @@ export function VoiceBar({ roomId }: { roomId: string }) {
               <Avatar name={p.name} id={p.id} size={30} />
               {p.muted && (
                 <span className="voice-muted">
-                  <Icon name="micOff" size={10} label="المايك مقفول" />
+                  <Icon name="micOff" size={10} label="الميكروفون مغلق" />
                 </span>
               )}
             </span>
@@ -121,20 +121,20 @@ export function VoiceBar({ roomId }: { roomId: string }) {
       )}
       {state === 'connected' ? (
         <div className="head-actions">
-          <button type="button" className={`round small${micOn ? '' : ' off'}`} aria-pressed={!micOn} aria-label={micOn ? 'اقفل المايك' : 'افتح المايك'} onClick={() => void toggleMic()}>
+          <button type="button" className={`round small${micOn ? '' : ' off'}`} aria-pressed={!micOn} aria-label={micOn ? 'كتم الميكروفون' : 'تشغيل الميكروفون'} onClick={() => void toggleMic()}>
             <Icon name={micOn ? 'mic' : 'micOff'} />
           </button>
-          <button type="button" className={`round small${deafened ? ' off' : ''}`} aria-pressed={deafened} aria-label={deafened ? 'شغّل الصوت' : 'اكتم الصوت'} onClick={() => setDeafened(!deafened)}>
+          <button type="button" className={`round small${deafened ? ' off' : ''}`} aria-pressed={deafened} aria-label={deafened ? 'تشغيل الصوت' : 'كتم الصوت'} onClick={() => setDeafened(!deafened)}>
             <Icon name="headphones" />
           </button>
           <button type="button" className="btn danger" onClick={leave}>
-            خروج
+            مغادرة
           </button>
         </div>
       ) : (
         <button type="button" className="btn subtle" disabled={state === 'connecting'} onClick={() => void join()}>
           <Icon name="mic" size={18} />
-          {state === 'connecting' ? 'بنوصّل...' : 'ادخل الفويس'}
+          {state === 'connecting' ? 'جارٍ الاتصال...' : 'انضمام'}
         </button>
       )}
     </section>

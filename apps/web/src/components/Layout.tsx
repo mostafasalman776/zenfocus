@@ -25,7 +25,7 @@ export function LoginButton({ className = 'btn' }: { className?: string }) {
     const href = `/api/auth/google${invite ? `?invite=${encodeURIComponent(invite)}` : ''}`;
     return (
       <a className={className} href={href}>
-        الدخول بجوجل
+        تسجيل الدخول باستخدام Google
       </a>
     );
   }
@@ -36,7 +36,7 @@ export function LoginButton({ className = 'btn' }: { className?: string }) {
         type="button"
         className={className}
         onClick={async () => {
-          const name = window.prompt('اسم للتجربة (تطوير محلي بس)');
+          const name = window.prompt('اسم تجريبي (للتطوير المحلي فقط)');
           if (!name) return;
           const r = await api.devLogin(name, invite ?? undefined);
           await qc.invalidateQueries();
@@ -118,7 +118,7 @@ export function Layout() {
             <NavLink key={item.to} to={item.to} end={item.to === '/'}>
               <Icon name={item.icon} />
               {item.label}
-              {item.locked && <Icon name="lock" size={14} label="محتاج تسجيل" style={{ marginInlineStart: 'auto', color: 'var(--warm)' }} />}
+              {item.locked && <Icon name="lock" size={14} label="يتطلب تسجيل الدخول" style={{ marginInlineStart: 'auto', color: 'var(--warm)' }} />}
             </NavLink>
           ))}
           {me?.isAdmin && (
@@ -149,9 +149,6 @@ export function Layout() {
           </div>
         ) : (
           <div className="card" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <span style={{ fontSize: 13 }} className="muted">
-              سجّل عشان تحفظ ساعاتك وتنافس صحابك
-            </span>
             <LoginButton />
           </div>
         )}
@@ -184,7 +181,7 @@ export function Layout() {
             {item.label}
             {item.locked && (
               <span className="lock">
-                <Icon name="lock" size={12} label="محتاج تسجيل" />
+                <Icon name="lock" size={12} label="يتطلب تسجيل الدخول" />
               </span>
             )}
           </NavLink>

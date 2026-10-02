@@ -95,6 +95,6 @@ export function announceFocus(userId: string, name: string, state: 'focus' | 'pa
   setFocusState(userId, state);
   if (startedMinutes) {
     const roomId = roomOf(userId);
-    if (roomId) emitRoom(roomId, 'room:event', { text: `${name} بدأ جلسة تركيز ${startedMinutes} دقيقة` });
+    if (roomId) emitRoom(roomId, 'room:event', { text: `بدأ ${name} جلسة تركيز (${startedMinutes} دقيقة)` });
   }
 }

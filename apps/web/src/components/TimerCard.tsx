@@ -43,7 +43,7 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
     try {
       await fn();
     } catch {
-      setError('معرفناش نوصل للسيرفر، جرّب تاني');
+      setError('تعذّر الاتصال بالخادم، حاول مرة أخرى');
     } finally {
       setBusy(false);
     }
@@ -54,9 +54,9 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
       ? 'متوقف مؤقتاً'
       : t.mode === 'focus'
         ? t.status === 'running'
-          ? `وقت التركيز · جلسة ${t.cycle + 1} من 4`
-          : 'جاهز تبدأ؟'
-        : 'وقت البريك، ريّح شوية';
+          ? `جلسة ${t.cycle + 1} من 4`
+          : 'جاهز للبدء'
+        : 'وقت الاستراحة';
 
   return (
     <section className="card timer" aria-label="التايمر">
@@ -106,7 +106,7 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
 
       {t.mode === 'focus' && (
         <label className="current-task">
-          <span className="muted">شغّال على:</span>
+          <span className="muted">المهمة:</span>
           <select
             value={t.taskId ?? ''}
             disabled={t.status !== 'idle'}
@@ -144,11 +144,10 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
         <span style={{ width: 56 }} aria-hidden="true" />
       </div>
 
-      <div className="dots" aria-label={`${t.cycle} من 4 جلسات قبل الراحة الطويلة`}>
+      <div className="dots" aria-label={`${t.cycle} من 4 جلسات قبل الاستراحة الطويلة`}>
         {[0, 1, 2, 3].map((i) => (
           <i key={i} className={i < t.cycle ? 'on' : ''} />
         ))}
-        <span style={{ marginInlineStart: 6 }}>راحة طويلة كل 4 جلسات</span>
       </div>
 
       <div className="timer-foot">
@@ -163,10 +162,9 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
             }}
           >
             <span className="knob" />
-            خلّي الشاشة صاحية
+            إبقاء الشاشة مضاءة
           </button>
         )}
-        {!signedIn && t.mode === 'focus' && <span>الجلسات محفوظة على الجهاز ده بس</span>}
       </div>
       {error && (
         <p role="alert" style={{ color: 'var(--danger)', fontSize: 14 }}>

@@ -6,7 +6,7 @@ import { api } from '../lib/api';
 import { RequireAccount } from './RequireAccount';
 
 const SHADES = ['var(--surface-2)', '#2f4a3e', '#4f7a66', '#72a38b', '#a5d2bc'];
-const DAY_NAMES = ['الأحد', 'الاتنين', 'التلات', 'الأربع', 'الخميس', 'الجمعة', 'السبت'];
+const DAY_NAMES = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
 const TAG_COLORS = ['#8fbfa8', '#8fa8cf', '#e8b88a', '#b7a3d6', '#d9a0a0', '#a9c79a'];
 
 function level(seconds: number) {
@@ -41,17 +41,16 @@ function Stats() {
       <header className="page-head">
         <div>
           <h1>إحصائياتي</h1>
-          <p>كل جلسة خلصتها من أول ما سجلت، ومعاها جلسات الزائر اللي اتنقلت</p>
         </div>
       </header>
 
       {s.totalSeconds === 0 && (
-        <section className="card empty-state" aria-label="لسه مفيش إحصائيات">
+        <section className="card empty-state" aria-label="لا توجد إحصائيات">
           <span className="empty-icon">
             <Icon name="chart" size={30} />
           </span>
-          <h2>إحصائياتك هتبان هنا</h2>
-          <p>كل جلسة تركيز بتكملها بتظهر هنا: أيامك، وأطول ستريك، ووقتك رايح على أنهي مادة. ابدأ أول جلسة دلوقتي.</p>
+          <h2>لا توجد إحصائيات بعد</h2>
+          <p>ستظهر هنا بعد أول جلسة تركيز.</p>
           <Link className="btn" to="/">
             ابدأ جلسة
           </Link>
@@ -64,11 +63,11 @@ function Stats() {
           <span className="value">{formatDuration(s.totalSeconds)}</span>
         </div>
         <div className="kpi">
-          <span className="label">المتوسط في الأيام اللي ذاكرت فيها</span>
+          <span className="label">المتوسط اليومي</span>
           <span className="value">{formatDuration(s.dailyAverageSeconds)}</span>
         </div>
         <div className="kpi">
-          <span className="label">أطول ستريك</span>
+          <span className="label">أطول سلسلة أيام</span>
           <span className="value" style={{ color: 'var(--warm)' }}>
             {s.longestStreak}
             <small> يوم</small>
@@ -89,7 +88,7 @@ function Stats() {
             {SHADES.map((c) => (
               <span key={c} className="heat-cell" style={{ background: c, width: 14, height: 14 }} />
             ))}
-            <span>أكتر</span>
+            <span>أكثر</span>
           </div>
         </div>
         <div className="heat" role="img" aria-label="خريطة ساعات التركيز لآخر 6 شهور">
@@ -109,9 +108,9 @@ function Stats() {
       </section>
 
       <div className="cols" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-        <section className="card" aria-label="الأسبوع ده">
+        <section className="card" aria-label="هذا الأسبوع">
           <div className="card-head">
-            <h2>الأسبوع ده</h2>
+            <h2>هذا الأسبوع</h2>
             <span className="num muted">{formatDuration(weekTotal)}</span>
           </div>
           <div className="bars">
@@ -133,9 +132,9 @@ function Stats() {
 
         <section className="card" aria-label="التوزيع">
           <div className="card-head">
-            <h2>وقتك رايح فين</h2>
+            <h2>توزيع الوقت</h2>
           </div>
-          {s.tags.length === 0 && <p className="empty">لسه مفيش جلسات.</p>}
+          {s.tags.length === 0 && <p className="empty">لا توجد جلسات بعد.</p>}
           {s.tags.map((t, i) => (
             <div className="tagrow" key={t.tag}>
               <div className="top">

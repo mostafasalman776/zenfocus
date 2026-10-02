@@ -8,8 +8,8 @@ export type TimerStatus = 'idle' | 'running' | 'paused';
 
 export const MODE_LABEL: Record<TimerMode, string> = {
   focus: 'تركيز',
-  short: 'راحة قصيرة',
-  long: 'راحة طويلة'
+  short: 'استراحة قصيرة',
+  long: 'استراحة طويلة'
 };
 
 const DEFAULT_MINUTES: Record<TimerMode, number> = { focus: 25, short: 5, long: 15 };
@@ -49,7 +49,7 @@ const minutes = loadPref<Record<TimerMode, number>>('minutes', DEFAULT_MINUTES);
 
 function formatCredit(seconds: number) {
   const m = Math.round(seconds / 60);
-  return m ? `اتحسبلك ${m} دقيقة` : 'الجلسة كانت أقل من 5 دقايق ومتحسبتش';
+  return m ? `تم احتساب ${m} دقيقة` : 'لم تُحتسب الجلسة (أقل من 5 دقائق)';
 }
 
 function notify(title: string, body: string) {
@@ -92,24 +92,24 @@ export const useTimer = create<TimerState>((set, get) => {
     const s = get();
     playChime();
     if (s.mode === 'focus') {
-      let notice = 'أحسنت! خد بريك';
+      let notice = 'أحسنت! وقت الاستراحة';
       if (s.tracked) {
         try {
           const r = await api.focusEnd('completed');
           if (r.ended) notice = `أحسنت! ${formatCredit(r.ended.creditedSeconds)}`;
         } catch {
-          notice = 'خلصت الجلسة، بس معرفناش نوصل للسيرفر. هتتحسب لما النت يرجع.';
+          notice = 'انتهت الجلسة، لكن تعذّر الاتصال بالخادم.';
         }
       } else {
         guestRecord(true);
       }
-      notify('خلصت جلسة التركيز', 'وقت البريك');
+      notify('انتهت جلسة التركيز', 'وقت الاستراحة');
       const cycle = s.cycle + 1;
       const next: TimerMode = cycle % LONG_BREAK_EVERY === 0 ? 'long' : 'short';
       idleIn(next, { cycle: next === 'long' ? 0 : cycle, notice });
     } else {
-      notify('البريك خلص', 'يلا نرجع نركز');
-      idleIn('focus', { notice: 'البريك خلص، يلا نكمل' });
+      notify('انتهت الاستراحة', 'حان وقت التركيز');
+      idleIn('focus', { notice: 'انتهت الاستراحة' });
     }
   }
 
@@ -189,7 +189,7 @@ export const useTimer = create<TimerState>((set, get) => {
           const r = await api.focusEnd('stopped');
           if (r.ended) notice = formatCredit(r.ended.creditedSeconds);
         } catch {
-          notice = 'معرفناش نوصل للسيرفر';
+          notice = 'تعذّر الاتصال بالخادم';
         }
       } else if (s.status !== 'idle') {
         guestRecord(false);
@@ -225,7 +225,7 @@ export const useTimer = create<TimerState>((set, get) => {
       }
       if (r.ended && s.tracked && s.status !== 'idle') {
         // The server closed it while we were away (grace window passed).
-        idleIn('focus', { notice: `الجلسة اتقفلت وإنت برا. ${formatCredit(r.ended.creditedSeconds)}` });
+        idleIn('focus', { notice: `انتهت الجلسة أثناء غيابك. ${formatCredit(r.ended.creditedSeconds)}` });
       }
     },
 

@@ -58,7 +58,7 @@ export function ZenMode({ tasks, signedIn, onClose }: { tasks: Task[]; signedIn:
       <button type="button" className="icon-btn zen-close" aria-label="خروج من وضع التركيز الكامل" onClick={onClose}>
         <Icon name="minimize" />
       </button>
-      {task && t.mode === 'focus' && <span className="zen-task">شغّال على: {task.title}</span>}
+      {task && t.mode === 'focus' && <span className="zen-task">المهمة: {task.title}</span>}
       <div className={`ring${t.mode === 'focus' ? '' : ' break'}${t.status === 'running' ? ' running' : ''}`}>
         <svg viewBox="0 0 320 320" aria-hidden="true">
           <circle className="track" cx="160" cy="160" r={R} fill="none" strokeWidth="6" />
@@ -68,7 +68,7 @@ export function ZenMode({ tasks, signedIn, onClose }: { tasks: Task[]; signedIn:
           <span className="time" role="timer">
             {fmt(t.remaining)}
           </span>
-          <span className="status">{t.mode === 'focus' ? 'وقت التركيز' : 'وقت البريك'}</span>
+          <span className="status">{t.mode === 'focus' ? 'وقت التركيز' : 'وقت الاستراحة'}</span>
         </div>
       </div>
       <div className="controls">

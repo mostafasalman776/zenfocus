@@ -10,10 +10,8 @@ export function RequireAccount({ what, children }: { what: string; children: Rea
   return (
     <section className="card" style={{ maxWidth: 520, margin: '10vh auto 0', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: 32 }}>
       <Icon name="lock" size={32} style={{ color: 'var(--warm)' }} />
-      <h1 style={{ fontSize: 22 }}>{what} محتاجة حساب</h1>
-      <p className="muted">
-        سجّل بحساب جوجل في ثانية. المهام والجلسات اللي عملتها كزائر هتتنقل معاك.
-      </p>
+      <h1 style={{ fontSize: 22 }}>سجّل الدخول للمتابعة</h1>
+      <p className="muted">{what} متاحة للمستخدمين المسجلين.</p>
       <LoginButton />
     </section>
   );

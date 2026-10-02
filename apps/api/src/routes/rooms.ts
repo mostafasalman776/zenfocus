@@ -66,7 +66,7 @@ export async function roomRoutes(app: FastifyInstance) {
       if ((owned?.n ?? 0) >= ROOM_RULES.maxOwnedRooms) return reply.code(422).send({ error: 'too_many_rooms' });
       const [room] = await db.insert(rooms).values({ name, ownerId: me.id, inviteCode: await uniqueRoomCode() }).returning();
       await db.insert(rm).values({ roomId: room!.id, userId: me.id, role: 'owner' });
-      await systemMessage(room!.id, `${me.name} عمل الغرفة`);
+      await systemMessage(room!.id, `أنشأ ${me.name} الغرفة`);
       return { room: await roomDetail(room!, 'owner') };
     });
 
@@ -144,7 +144,7 @@ export async function roomRoutes(app: FastifyInstance) {
       if (!ids.includes(me.id)) {
         if (ids.length >= ROOM_RULES.maxMembers) return reply.code(422).send({ error: 'room_full' });
         await db.insert(rm).values({ roomId: room.id, userId: me.id, role: 'member' }).onConflictDoNothing();
-        await systemMessage(room.id, `${me.name} دخل الغرفة`);
+        await systemMessage(room.id, `انضم ${me.name} إلى الغرفة`);
         emitRoom(room.id, 'room:members', {});
       }
       return { roomId: room.id };
@@ -159,7 +159,7 @@ export async function roomRoutes(app: FastifyInstance) {
       await db.delete(rm).where(and(eq(rm.roomId, id), eq(rm.userId, me.id)));
       await evict(id, me.id);
       await removeFromVoice(id, me.id);
-      await systemMessage(id, `${me.name} خرج من الغرفة`);
+      await systemMessage(id, `غادر ${me.name} الغرفة`);
       emitRoom(id, 'room:members', {});
       return { ok: true };
     });

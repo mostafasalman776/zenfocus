@@ -17,7 +17,7 @@ export function TaskList({ api }: { api: TasksApi }) {
   return (
     <section className="card" aria-label="المهام">
       <div className="card-head">
-        <h2>مهامي</h2>
+        <h2>المهام</h2>
         <span className="num muted" style={{ fontSize: 13 }}>
           {done} / {api.tasks.length}
         </span>
@@ -39,7 +39,7 @@ export function TaskList({ api }: { api: TasksApi }) {
         <input
           id="new-task"
           className="input"
-          placeholder="ضيف مهمة جديدة..."
+          placeholder="أضف مهمة..."
           value={title}
           maxLength={LIMITS.taskTitleMax}
           onChange={(e) => setTitle(e.target.value)}
@@ -53,7 +53,7 @@ export function TaskList({ api }: { api: TasksApi }) {
           style={{ width: 64, padding: '0 8px' }}
           value={est}
           onChange={(e) => setEst(Number(e.target.value))}
-          title="كام جلسة متوقعة"
+          title="عدد الجلسات المتوقعة"
         >
           {[1, 2, 3, 4, 5, 6, 8].map((n) => (
             <option key={n} value={n}>
@@ -67,7 +67,7 @@ export function TaskList({ api }: { api: TasksApi }) {
       </form>
 
       {sorted.length === 0 ? (
-        <p className="empty">مفيش مهام لسه. ابدأ بحاجة صغيرة.</p>
+        <p className="empty">لا توجد مهام بعد.</p>
       ) : (
         <ul className="tasks">
           {sorted.map((t) => (
@@ -76,7 +76,7 @@ export function TaskList({ api }: { api: TasksApi }) {
                 type="button"
                 className="check"
                 aria-pressed={t.done}
-                aria-label={t.done ? `رجّع "${t.title}"` : `خلصت "${t.title}"`}
+                aria-label={t.done ? `إلغاء إنجاز "${t.title}"` : `إنجاز "${t.title}"`}
                 onClick={() => api.toggle(t)}
               >
                 {t.done && <Icon name="check" size={14} />}
@@ -84,15 +84,15 @@ export function TaskList({ api }: { api: TasksApi }) {
               <span
                 className="title"
                 onDoubleClick={() => idle && !t.done && setTask(t.id)}
-                title={idle && !t.done ? 'دبل كليك عشان تشتغل عليها' : undefined}
+                title={idle && !t.done ? 'انقر مرتين لاختيارها' : undefined}
               >
                 {t.title}
               </span>
-              <span className="pomos" title="جلسات خلصت / متوقعة">
+              <span className="pomos" title="الجلسات المنجزة / المتوقعة">
                 <Icon name="timer" size={14} />
                 {t.donePomodoros}/{t.estPomodoros}
               </span>
-              <button type="button" className="del" aria-label={`امسح "${t.title}"`} onClick={() => api.remove(t)}>
+              <button type="button" className="del" aria-label={`حذف "${t.title}"`} onClick={() => api.remove(t)}>
                 <Icon name="x" size={16} />
               </button>
             </li>

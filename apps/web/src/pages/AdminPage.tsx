@@ -6,7 +6,7 @@ export function AdminPage() {
   const { me } = useMe();
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ['reports'], queryFn: api.reports, enabled: Boolean(me?.isAdmin) });
-  if (!me?.isAdmin) return <p className="empty">الصفحة دي للأدمن بس.</p>;
+  if (!me?.isAdmin) return <p className="empty">هذه الصفحة للمشرفين فقط.</p>;
   const resolve = (id: string, del: boolean) =>
     api.resolveReport(id, del).then(() => qc.invalidateQueries({ queryKey: ['reports'] }));
   return (
@@ -14,10 +14,9 @@ export function AdminPage() {
       <header className="page-head">
         <div>
           <h1>البلاغات</h1>
-          <p>رسايل وصور اتبلّغ عنها ولسه متراجعتش</p>
         </div>
       </header>
-      {q.data?.reports.length === 0 && <p className="empty">مفيش بلاغات.</p>}
+      {q.data?.reports.length === 0 && <p className="empty">لا توجد بلاغات.</p>}
       {q.data?.reports.map((r) => (
         <section key={r.id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <span className="muted" style={{ fontSize: 13 }}>
@@ -29,14 +28,14 @@ export function AdminPage() {
               {r.message.image && (
                 <img src={r.message.image.url} alt="الصورة المبلّغ عنها" style={{ maxWidth: 320, borderRadius: 12 }} />
               )}
-              <p>{r.message.deleted ? 'اتمسحت' : r.message.body}</p>
+              <p>{r.message.deleted ? 'محذوفة' : r.message.body}</p>
             </>
           ) : (
-            <p className="muted">الرسالة مش موجودة</p>
+            <p className="muted">الرسالة غير موجودة</p>
           )}
           <div className="head-actions">
             <button type="button" className="btn danger" onClick={() => resolve(r.id, true)}>
-              امسح الرسالة
+              حذف الرسالة
             </button>
             <button type="button" className="btn ghost" onClick={() => resolve(r.id, false)}>
               تجاهل

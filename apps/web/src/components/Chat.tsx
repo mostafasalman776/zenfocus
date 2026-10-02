@@ -33,7 +33,7 @@ function Bubble({ msg, mine, canDelete, onReply, onEdit }: {
       <div className="msg-body">
         <span className="msg-meta">
           {!mine && <b>{msg.user?.name ?? 'مستخدم محذوف'}</b>} {time(msg.createdAt)}
-          {msg.editedAt && ' · متعدّلة'}
+          {msg.editedAt && ' · معدّلة'}
         </span>
         {msg.replyTo && (
           <span className="msg-reply">
@@ -41,7 +41,7 @@ function Bubble({ msg, mine, canDelete, onReply, onEdit }: {
           </span>
         )}
         {msg.deleted ? (
-          <p className="bubble deleted">الرسالة دي اتمسحت</p>
+          <p className="bubble deleted">تم حذف الرسالة</p>
         ) : (
           <>
             {msg.kind === 'image' &&
@@ -50,7 +50,7 @@ function Bubble({ msg, mine, canDelete, onReply, onEdit }: {
                   <a href={msg.image.url} target="_blank" rel="noreferrer">
                     <img
                       src={msg.image.url}
-                      alt="صورة في الشات"
+                      alt="صورة في المحادثة"
                       loading="lazy"
                       width={msg.image.width}
                       height={msg.image.height}
@@ -63,7 +63,7 @@ function Bubble({ msg, mine, canDelete, onReply, onEdit }: {
                   </figcaption>
                 </figure>
               ) : (
-                <p className="bubble deleted">الصورة انتهت (الصور بتتمسح بعد {ROOM_RULES.imageRetentionDays} يوم)</p>
+                <p className="bubble deleted">انتهت صلاحية الصورة</p>
               ))}
             {msg.body && <p className="bubble">{msg.body}</p>}
           </>
@@ -73,16 +73,16 @@ function Bubble({ msg, mine, canDelete, onReply, onEdit }: {
             <button type="button" onClick={onReply}>رد</button>
             {editable && <button type="button" onClick={onEdit}>تعديل</button>}
             {(mine || canDelete) && (
-              <button type="button" onClick={() => window.confirm('تمسح الرسالة؟') && void api.deleteMessage(msg.id)}>
-                مسح
+              <button type="button" onClick={() => window.confirm('حذف الرسالة؟') && void api.deleteMessage(msg.id)}>
+                حذف
               </button>
             )}
             {!mine && (
               <button
                 type="button"
                 onClick={() => {
-                  const reason = window.prompt('إيه المشكلة في الرسالة دي؟ (اختياري)');
-                  if (reason !== null) void api.reportMessage(msg.id, reason).then(() => window.alert('وصل البلاغ، شكراً'));
+                  const reason = window.prompt('سبب الإبلاغ (اختياري)');
+                  if (reason !== null) void api.reportMessage(msg.id, reason).then(() => window.alert('تم إرسال البلاغ'));
                 }}
               >
                 إبلاغ
@@ -117,12 +117,12 @@ export function Chat({ roomId, me, role, messages, hasMore, onLoadMore, events, 
   const fail = (e: unknown) =>
     setError(
       e instanceof ApiError && e.status === 429
-        ? 'بالراحة شوية، استنى دقيقة'
+        ? 'محاولات كثيرة، حاول بعد دقيقة'
         : e instanceof ApiError && e.status === 413
           ? 'الصورة أكبر من 10MB'
           : e instanceof ApiError && e.status === 415
-            ? 'الملف ده مش صورة'
-            : 'الرسالة موصلتش، جرّب تاني'
+            ? 'الملف ليس صورة'
+            : 'تعذّر الإرسال، حاول مرة أخرى'
     );
 
   const send = async (e: React.FormEvent) => {
@@ -158,12 +158,9 @@ export function Chat({ roomId, me, role, messages, hasMore, onLoadMore, events, 
   };
 
   return (
-    <section className="chat" aria-label="الشات">
+    <section className="chat" aria-label="المحادثة">
       <div className="chat-head">
-        <h2>الشات</h2>
-        <span className="muted" style={{ fontSize: 12 }}>
-          الصور بتتضغط قبل الرفع وبتتمسح بعد {ROOM_RULES.imageRetentionDays} يوم
-        </span>
+        <h2>المحادثة</h2>
       </div>
       <div
         className="chat-list"
@@ -175,7 +172,7 @@ export function Chat({ roomId, me, role, messages, hasMore, onLoadMore, events, 
       >
         {hasMore && (
           <button type="button" className="btn ghost sm" style={{ alignSelf: 'center' }} onClick={onLoadMore}>
-            رسايل أقدم
+            رسائل أقدم
           </button>
         )}
         {messages.map((msg) =>
@@ -209,13 +206,13 @@ export function Chat({ roomId, me, role, messages, hasMore, onLoadMore, events, 
       </div>
       {typing.length > 0 && (
         <div className="typing" aria-live="polite">
-          {typing.join('، ')} {typing.length === 1 ? 'بيكتب...' : 'بيكتبوا...'}
+          {typing.join('، ')} {typing.length === 1 ? 'يكتب الآن...' : 'يكتبون الآن...'}
         </div>
       )}
       {(replyTo || editing) && (
         <div className="reply-bar">
           <span>
-            {editing ? 'بتعدّل رسالتك' : `رد على ${replyTo!.user?.name ?? ''}: ${replyTo!.body.slice(0, 60) || 'صورة'}`}
+            {editing ? 'تعديل الرسالة' : `ردًا على ${replyTo!.user?.name ?? ''}: ${replyTo!.body.slice(0, 60) || 'صورة'}`}
           </span>
           <button
             type="button"
@@ -255,7 +252,7 @@ export function Chat({ roomId, me, role, messages, hasMore, onLoadMore, events, 
         <input
           id="chat-input"
           className="input"
-          placeholder={uploading ? 'بنرفع الصورة...' : 'اكتب رسالة...'}
+          placeholder={uploading ? 'جارٍ رفع الصورة...' : 'اكتب رسالة...'}
           value={text}
           maxLength={ROOM_RULES.messageMax}
           onChange={(e) => {
