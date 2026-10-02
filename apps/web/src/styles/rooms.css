@@ -25,7 +25,7 @@
 /* ---------- Chat ---------- */
 .chat {
   background: var(--bg-side); border: 1px solid var(--line); border-radius: var(--radius-lg);
-  display: flex; flex-direction: column; height: calc(100vh - 48px); max-height: 860px; overflow: hidden;
+  display: flex; flex-direction: column; height: calc(100dvh - 48px); max-height: 860px; overflow: hidden;
 }
 .chat-head { padding: 18px 20px 12px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; }
 .chat-head h2 { font-size: 17px; }
@@ -64,7 +64,7 @@
   .room-tabs { display: inline-flex; }
   .hide-on-mobile { display: none; }
   .room-chat { position: static; }
-  .chat { height: calc(100vh - 260px); min-height: 420px; }
+  .chat { height: calc(100dvh - 260px); min-height: 420px; }
 }
 @media (max-width: 900px) {
   .chat { height: calc(100dvh - 330px); }

@@ -25,7 +25,7 @@ body {
     radial-gradient(55vmax 55vmax at 0% 100%, var(--glow-2), transparent 70%),
     var(--bg);
   background-repeat: no-repeat;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 .app, .side { background: transparent; }
 .side { background: color-mix(in srgb, var(--bg-side) 88%, transparent); }
@@ -483,3 +483,24 @@ a.kpi:hover, .room-link:hover { transform: translateY(-2px); border-color: var(-
 /* Rooms page: list + side cards on desktop, one column on phones */
 .rooms-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 360px); }
 @media (max-width: 1100px) { .rooms-cols { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Touch & swipe behaviour (iOS Safari) ---------- */
+html, body {
+  overscroll-behavior: none;          /* no rubber-band pull that reveals blank space */
+  overflow-x: clip;                   /* nothing can drag the page sideways */
+  -webkit-text-size-adjust: 100%;
+}
+body { -webkit-tap-highlight-color: transparent; }
+button, a, .quick, .sound, .cheer-btn, .chat-peek { touch-action: manipulation; }
+button, .quick, .chat-peek, .segmented, .mobile-nav { -webkit-user-select: none; user-select: none; }
+/* Inner scroll areas keep their scroll to themselves */
+.sheet-body, .chat-list, .board, .heat { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.sheet-body { touch-action: pan-y; }
+/* Decorative layers never widen the page */
+.table-circle, .ring, .seat { contain: layout; }
+@media (max-width: 900px) {
+  /* Respect the notch / Dynamic Island and the home indicator */
+  .main { padding-top: max(12px, env(safe-area-inset-top)); }
+  .mobile-nav { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  .app { min-height: 100dvh; }
+}
