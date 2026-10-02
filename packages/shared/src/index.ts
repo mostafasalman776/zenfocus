@@ -22,6 +22,11 @@ export const FOCUS_RULES = {
   streakDaySeconds: 10 * 60
 } as const;
 
+/** Leaves in the daily garden: one per focus session needed to reach the daily goal. */
+export function gardenSize(goalSeconds: number, focusMinutes = 25): number {
+  return Math.min(12, Math.max(1, Math.round(goalSeconds / (focusMinutes * 60))));
+}
+
 export const LIMITS = {
   usernameMin: 3,
   usernameMax: 20,

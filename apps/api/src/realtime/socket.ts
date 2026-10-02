@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { SESSION_COOKIE, userFromToken } from '../auth/session.js';
 import { env } from '../env.js';
 import * as focus from '../focus/service.js';
-import { membership } from '../rooms/service.js';
+import { allow, membership } from '../rooms/service.js';
 import { emitRoom, enter, leave, roomOf, setFocusState, setIo } from './hub.js';
 
 function cookieValue(header: string | undefined, name: string): string | undefined {
@@ -64,6 +64,14 @@ export function attachRealtime(app: FastifyInstance) {
     });
 
     socket.on('room:leave', () => leaveCurrent());
+
+    socket.on('room:cheer', (raw: unknown) => {
+      const roomId = socket.data.roomId as string | undefined;
+      const parsed = z.object({ kind: z.enum(['star', 'heart', 'flame']) }).safeParse(raw);
+      if (!roomId || !parsed.success) return;
+      if (!allow(`cheer:${userId}`, 12)) return;
+      emitRoom(roomId, 'room:cheer', { userId, name: socket.data.name, kind: parsed.data.kind, at: Date.now() });
+    });
 
     socket.on('chat:typing', () => {
       const roomId = socket.data.roomId as string | undefined;

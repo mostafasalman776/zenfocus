@@ -69,6 +69,11 @@ export const api = {
   focusEnd: (reason: 'completed' | 'stopped') => request<FocusResult>('POST', '/api/focus/end', { reason }),
 
   friends: () => request<FriendsPayload>('GET', '/api/friends'),
+  friendsFocusing: () =>
+    request<{ friends: { userId: string; name: string; username: string | null; avatarUrl: string | null }[] }>(
+      'GET',
+      '/api/friends/focusing'
+    ),
   requestFriend: (username: string) =>
     request<{ status: 'requested' | 'friends' | 'already_friends' }>('POST', '/api/friends/requests', { username }),
   acceptFriend: (requestId: string) => request('POST', `/api/friends/requests/${requestId}/accept`),

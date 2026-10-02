@@ -31,7 +31,9 @@ interface TimerState {
   /** Guest bookkeeping: when the focus run started. */
   guestStartedAt: number | null;
   notice: string | null;
+  keepAwake: boolean;
 
+  setKeepAwake: (on: boolean) => void;
   setMode: (mode: TimerMode) => void;
   setTask: (taskId: string | null) => void;
   start: (signedIn: boolean) => Promise<void>;
@@ -124,6 +126,12 @@ export const useTimer = create<TimerState>((set, get) => {
     tracked: false,
     guestStartedAt: null,
     notice: null,
+    keepAwake: loadPref('keepAwake', false),
+
+    setKeepAwake(on) {
+      savePref('keepAwake', on);
+      set({ keepAwake: on });
+    },
 
     setMode(mode) {
       if (get().status !== 'idle') return;

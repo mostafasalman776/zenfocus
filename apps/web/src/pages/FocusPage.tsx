@@ -1,13 +1,18 @@
 import { formatDuration } from '@zenfocus/shared';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Link } from 'react-router';
+import { DailyGarden, guestToday } from '../components/Garden';
 import { Icon } from '../components/Icon';
 import { LoginButton } from '../components/Layout';
-import { Sounds } from '../components/Sounds';
+import { Sheet } from '../components/Sheet';
+import { Sounds, activeSoundLabel, useSoundStore } from '../components/Sounds';
 import { TaskList } from '../components/TaskList';
 import { TimerCard } from '../components/TimerCard';
 import { api } from '../lib/api';
-import { useMe, useTasks } from '../lib/hooks';
+import { loadGuestSessions } from '../lib/guest';
+import { useIsMobile, useMe, useTasks, wakeLockSupported } from '../lib/hooks';
+import { useTimer } from '../stores/timer';
 
 function greeting() {
   const h = new Date().getHours();
@@ -17,10 +22,73 @@ function greeting() {
   return 'مساء الخير';
 }
 
-export function FocusPage() {
+/** Phone layout: everything on one screen; tasks and sounds open as sheets. */
+function MobileFocus() {
   const { me } = useMe();
   const tasks = useTasks(me);
   const today = useQuery({ queryKey: ['today'], queryFn: api.today, enabled: Boolean(me), refetchInterval: 60_000 });
+  const notice = useTimer((s) => s.notice);
+  const keepAwake = useTimer((s) => s.keepAwake);
+  const setKeepAwake = useTimer((s) => s.setKeepAwake);
+  const [sheet, setSheet] = useState<'tasks' | 'sounds' | null>(null);
+  const sound = activeSoundLabel(useSoundStore((s) => s.on));
+  const d = today.data;
+  // Guests: re-read local history after each finished session (notice changes).
+  const guest = !me ? guestToday(loadGuestSessions()) : null;
+  void notice;
+  const open = tasks.tasks.filter((t) => !t.done).length;
+
+  return (
+    <div className="m-focus">
+      <TimerCard tasks={tasks.tasks} signedIn={Boolean(me)} compact />
+      <DailyGarden
+        sessions={d?.sessions ?? guest?.sessions ?? 0}
+        seconds={d?.seconds ?? guest?.seconds ?? 0}
+        goalSeconds={d?.goalSeconds ?? 4 * 3600}
+        rank={d?.friendsCount ? d.rank : null}
+      />
+      <div className="quick-row">
+        <button type="button" className="quick" onClick={() => setSheet('tasks')}>
+          <Icon name="list" size={20} />
+          <span>المهام</span>
+          <span className="num muted">
+            {tasks.tasks.length - open}/{tasks.tasks.length}
+          </span>
+        </button>
+        <button type="button" className="quick" onClick={() => setSheet('sounds')}>
+          <Icon name="rain" size={20} />
+          <span>الأصوات</span>
+          <span className="muted">{sound ?? 'إيقاف'}</span>
+        </button>
+      </div>
+
+      {sheet === 'tasks' && (
+        <Sheet title="المهام" onClose={() => setSheet(null)} tall>
+          <TaskList api={tasks} />
+        </Sheet>
+      )}
+      {sheet === 'sounds' && (
+        <Sheet title="الأصوات" onClose={() => setSheet(null)}>
+          <Sounds />
+          {wakeLockSupported && (
+            <button type="button" className="toggle sheet-toggle" aria-pressed={keepAwake} onClick={() => setKeepAwake(!keepAwake)}>
+              <span className="knob" />
+              إبقاء الشاشة مضاءة أثناء الجلسة
+            </button>
+          )}
+        </Sheet>
+      )}
+    </div>
+  );
+}
+
+export function FocusPage() {
+  const isMobile = useIsMobile();
+  const { me } = useMe();
+  const tasks = useTasks(me);
+  const today = useQuery({ queryKey: ['today'], queryFn: api.today, enabled: Boolean(me), refetchInterval: 60_000 });
+  if (isMobile) return <MobileFocus />;
+
   const d = today.data;
   const goalPct = d ? Math.min(100, Math.round((d.seconds / d.goalSeconds) * 100)) : 0;
   const left = d ? Math.max(0, d.goalSeconds - d.seconds) : 0;

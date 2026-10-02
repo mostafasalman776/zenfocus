@@ -34,6 +34,20 @@ export async function friendRoutes(app: FastifyInstance) {
     return { friends, incoming, outgoing };
   });
 
+  /** Friends with a focus session running right now (for the "focusing now" badge). */
+  app.get('/api/friends/focusing', async (request) => {
+    const me = currentUser(request);
+    const ids = await friendIds(me.id);
+    if (!ids.length) return { friends: [] };
+    const rows = await db
+      .selectDistinct(summary)
+      .from(schema.focusSessions)
+      .innerJoin(u, eq(u.id, schema.focusSessions.userId))
+      .where(and(inArray(schema.focusSessions.userId, ids), eq(schema.focusSessions.status, 'running')))
+      .limit(20);
+    return { friends: rows };
+  });
+
   /** Send a request by username. If they already asked us, this accepts it. */
   app.post('/api/friends/requests', async (request, reply) => {
     const me = currentUser(request);

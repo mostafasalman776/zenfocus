@@ -1,6 +1,5 @@
 import type { Task, TimerMode } from '@zenfocus/shared';
 import { useEffect, useState } from 'react';
-import { loadPref, savePref } from '../lib/guest';
 import { useWakeLock, wakeLockSupported } from '../lib/hooks';
 import { MODE_LABEL, useTimer } from '../stores/timer';
 
@@ -17,11 +16,12 @@ function fmt(seconds: number) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolean }) {
+export function TimerCard({ tasks, signedIn, compact = false }: { tasks: Task[]; signedIn: boolean; compact?: boolean }) {
   const t = useTimer();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [keepAwake, setKeepAwake] = useState(() => loadPref('keepAwake', false));
+  const keepAwake = useTimer((s) => s.keepAwake);
+  const setKeepAwake = useTimer((s) => s.setKeepAwake);
   const [zen, setZen] = useState(false);
   useWakeLock(t.status === 'running', keepAwake);
 
@@ -61,13 +61,13 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
         : 'وقت الاستراحة';
 
   return (
-    <section className="card timer" aria-label="التايمر">
+    <section className={`card timer${compact ? ' compact' : ''}`} aria-label="التايمر">
       {zen && <ZenMode tasks={tasks} signedIn={signedIn} onClose={() => setZen(false)} />}
-      <div className="timer-top">
+      {!compact && <div className="timer-top">
         <button type="button" className="icon-btn" aria-label="وضع التركيز الكامل" title="وضع التركيز الكامل" onClick={() => setZen(true)}>
           <Icon name="maximize" size={18} />
         </button>
-      </div>
+      </div>}
       <div className="segmented" role="tablist" aria-label="نوع الجلسة">
         {(['focus', 'short', 'long'] as TimerMode[]).map((m) => (
           <button
@@ -144,31 +144,34 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
             <Icon name="play" size={30} style={{ transform: 'scaleX(-1)' }} />
           </button>
         )}
-        <span style={{ width: 56 }} aria-hidden="true" />
+        {compact ? (
+          <button type="button" className="round" aria-label="وضع التركيز الكامل" onClick={() => setZen(true)}>
+            <Icon name="maximize" size={20} />
+          </button>
+        ) : (
+          <span style={{ width: 56 }} aria-hidden="true" />
+        )}
       </div>
 
-      <div className="dots" aria-label={`${t.cycle} من 4 جلسات قبل الاستراحة الطويلة`}>
+      {!compact && <div className="dots" aria-label={`${t.cycle} من 4 جلسات قبل الاستراحة الطويلة`}>
         {[0, 1, 2, 3].map((i) => (
           <i key={i} className={i < t.cycle ? 'on' : ''} />
         ))}
-      </div>
+      </div>}
 
-      <div className="timer-foot">
+      {!compact && <div className="timer-foot">
         {wakeLockSupported && (
           <button
             type="button"
             className="toggle"
             aria-pressed={keepAwake}
-            onClick={() => {
-              setKeepAwake(!keepAwake);
-              savePref('keepAwake', !keepAwake);
-            }}
+            onClick={() => setKeepAwake(!keepAwake)}
           >
             <span className="knob" />
             إبقاء الشاشة مضاءة
           </button>
         )}
-      </div>
+      </div>}
       {error && (
         <p role="alert" style={{ color: 'var(--danger)', fontSize: 14 }}>
           {error}
