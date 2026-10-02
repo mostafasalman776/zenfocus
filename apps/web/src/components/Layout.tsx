@@ -171,6 +171,11 @@ export function Layout() {
             {me ? (
               <>
                 <FriendsPresence />
+                {me.isAdmin && (
+                  <NavLink to="/admin" className="icon-btn admin-btn" aria-label="لوحة التحكم">
+                    <Icon name="settings" size={20} />
+                  </NavLink>
+                )}
                 <button type="button" className="account-btn" aria-label="الحساب" onClick={() => setAccountOpen(true)}>
                   <Avatar name={me.name} src={me.avatarUrl} id={me.id} size={36} />
                 </button>

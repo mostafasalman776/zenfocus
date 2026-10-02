@@ -2,6 +2,7 @@ import { formatDuration, type AdminOverview } from '@zenfocus/shared';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Avatar } from '../components/Icon';
+import { LoginButton } from '../components/Layout';
 import { PageSkeleton } from '../components/Skeleton';
 import { api } from '../lib/api';
 import { useMe } from '../lib/hooks';
@@ -36,9 +37,25 @@ function ago(iso: string | null) {
 const date = (iso: string) => new Date(iso).toLocaleDateString('ar-EG-u-nu-latn', { day: 'numeric', month: 'short', year: 'numeric' });
 
 export function AdminPage() {
-  const { me } = useMe();
+  const { me, loading } = useMe();
   const [tab, setTab] = useState<Tab>('overview');
-  if (!me?.isAdmin) return <p className="empty">هذه الصفحة للمشرفين فقط.</p>;
+  if (loading) return <PageSkeleton blocks={[60, 110, 240]} />;
+  if (!me)
+    return (
+      <section className="card empty-state" aria-label="تسجيل الدخول">
+        <h2>سجّل الدخول بحساب المشرف</h2>
+        <LoginButton />
+      </section>
+    );
+  if (!me.isAdmin)
+    return (
+      <section className="card empty-state" aria-label="غير مسموح">
+        <h2>هذه الصفحة للمشرفين فقط</h2>
+        <p className="muted">
+          أنت مسجّل باسم <span dir="ltr">{me.username ? `@${me.username}` : me.name}</span>.
+        </p>
+      </section>
+    );
   return (
     <div className="admin">
       <header className="page-head">
