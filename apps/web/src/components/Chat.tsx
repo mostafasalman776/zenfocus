@@ -19,22 +19,46 @@ interface Props {
   typing: string[];
 }
 
-function Bubble({ msg, mine, canDelete, onReply, onEdit }: {
+function dayLabel(iso: string) {
+  const d = new Date(iso);
+  const today = new Date();
+  const yesterday = new Date(Date.now() - 86400_000);
+  if (d.toDateString() === today.toDateString()) return 'اليوم';
+  if (d.toDateString() === yesterday.toDateString()) return 'أمس';
+  return new Intl.DateTimeFormat('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
+}
+
+/** Same author, same day, within 5 minutes: render as one block. */
+function continues(prev: ChatMessage | undefined, msg: ChatMessage) {
+  return Boolean(
+    prev &&
+      prev.kind !== 'system' &&
+      msg.kind !== 'system' &&
+      prev.user?.id === msg.user?.id &&
+      Date.parse(msg.createdAt) - Date.parse(prev.createdAt) < 5 * 60_000 &&
+      new Date(prev.createdAt).toDateString() === new Date(msg.createdAt).toDateString()
+  );
+}
+
+function Bubble({ msg, mine, grouped, canDelete, onReply, onEdit }: {
   msg: ChatMessage;
   mine: boolean;
+  grouped: boolean;
   canDelete: boolean;
   onReply: () => void;
   onEdit: () => void;
 }) {
   const editable = mine && !msg.deleted && msg.kind === 'text' && Date.now() - Date.parse(msg.createdAt) < ROOM_RULES.editWindowSeconds * 1000;
   return (
-    <div className={`msg${mine ? ' mine' : ''}`}>
-      {!mine && msg.user && <Avatar name={msg.user.name} src={msg.user.avatarUrl} id={msg.user.id} size={34} />}
+    <div className={`msg${mine ? ' mine' : ''}${grouped ? ' grouped' : ''}`}>
+      {!mine && (grouped ? <span className="avatar-gap" /> : msg.user && <Avatar name={msg.user.name} src={msg.user.avatarUrl} id={msg.user.id} size={34} />)}
       <div className="msg-body">
-        <span className="msg-meta">
-          {!mine && <b>{msg.user?.name ?? 'مستخدم محذوف'}</b>} {time(msg.createdAt)}
-          {msg.editedAt && ' · معدّلة'}
-        </span>
+        {!grouped && (
+          <span className="msg-meta">
+            {!mine && <b>{msg.user?.name ?? 'مستخدم محذوف'}</b>} {time(msg.createdAt)}
+            {msg.editedAt && ' · معدّلة'}
+          </span>
+        )}
         {msg.replyTo && (
           <span className="msg-reply">
             <b>{msg.replyTo.userName ?? ''}</b> {msg.replyTo.body}
@@ -175,16 +199,19 @@ export function Chat({ roomId, me, role, messages, hasMore, onLoadMore, events, 
             رسائل أقدم
           </button>
         )}
-        {messages.map((msg) =>
-          msg.kind === 'system' ? (
-            <div key={msg.id} className="sys">
-              {msg.body}
-            </div>
-          ) : (
+        {messages.map((msg, i) => {
+          const prev = messages[i - 1];
+          const newDay = !prev || new Date(prev.createdAt).toDateString() !== new Date(msg.createdAt).toDateString();
+          return (
+            <div key={msg.id} className="msg-row">
+              {newDay && <div className="day-sep">{dayLabel(msg.createdAt)}</div>}
+              {msg.kind === 'system' ? (
+                <div className="sys">{msg.body}</div>
+              ) : (
             <Bubble
-              key={msg.id}
               msg={msg}
               mine={msg.user?.id === me.id}
+              grouped={!newDay && continues(prev, msg)}
               canDelete={role === 'owner'}
               onReply={() => {
                 setEditing(null);
@@ -196,8 +223,10 @@ export function Chat({ roomId, me, role, messages, hasMore, onLoadMore, events, 
                 setText(msg.body);
               }}
             />
-          )
-        )}
+              )}
+            </div>
+          );
+        })}
         {events.map((ev) => (
           <div key={ev.id} className="sys">
             {ev.text}

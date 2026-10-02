@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { loadPref, savePref } from '../lib/guest';
 import { useWakeLock, wakeLockSupported } from '../lib/hooks';
 import { MODE_LABEL, useTimer } from '../stores/timer';
+
+const MODE_SHORT: Record<TimerMode, string> = { focus: 'تركيز', short: 'قصيرة', long: 'طويلة' };
 import { Icon } from './Icon';
 import { ZenMode } from './ZenMode';
 
@@ -76,7 +78,8 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
             disabled={t.status !== 'idle' && t.mode !== m}
             onClick={() => t.setMode(m)}
           >
-            {MODE_LABEL[m]}
+            <span className="label-long">{MODE_LABEL[m]}</span>
+            <span className="label-short">{MODE_SHORT[m]}</span>
           </button>
         ))}
       </div>

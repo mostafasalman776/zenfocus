@@ -36,15 +36,20 @@ function RoomList() {
             <h2>غرفي</h2>
           </div>
           {rooms.data?.rooms.length ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="room-grid">
               {rooms.data.rooms.map((r) => (
-                <Link key={r.id} to={`/rooms/${r.id}`} className="room-link">
-                  <Icon name="users" />
-                  <span style={{ flexGrow: 1, fontWeight: 600 }}>{r.name}</span>
-                  <span className="muted num" style={{ fontSize: 13 }}>
-                    {r.memberCount} / {ROOM_RULES.maxMembers}
+                <Link key={r.id} to={`/rooms/${r.id}`} className="room-card">
+                  <span className="room-badge" aria-hidden="true">
+                    {r.name.trim().charAt(0)}
                   </span>
-                  {r.role === 'owner' && <span className="chip" style={{ padding: '2px 10px', fontSize: 12 }}>المالك</span>}
+                  <span className="room-name">{r.name}</span>
+                  <span className="room-meta">
+                    <Icon name="users" size={15} />
+                    <span className="num">
+                      {r.memberCount} / {ROOM_RULES.maxMembers}
+                    </span>
+                    {r.role === 'owner' && <span className="room-role">المالك</span>}
+                  </span>
                 </Link>
               ))}
             </div>

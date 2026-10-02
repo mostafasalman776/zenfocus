@@ -12,6 +12,7 @@ import { useNavigate, useParams } from 'react-router';
 import { Chat } from '../components/Chat';
 import { VoiceBar } from '../components/VoiceBar';
 import { Avatar, Icon } from '../components/Icon';
+import { PageSkeleton } from '../components/Skeleton';
 import { api } from '../lib/api';
 import { loadPref, savePref } from '../lib/guest';
 import { getSocket, useMe } from '../lib/hooks';
@@ -273,7 +274,7 @@ function Room({ id }: { id: string }) {
       </section>
     );
   }
-  if (!room || !me) return null;
+  if (!room || !me) return <PageSkeleton blocks={[130, 70, 260]} />;
 
   const inviteUrl = `${location.origin}/r/${room.inviteCode}`;
   const focusing = room.members.filter((m) => m.status === 'focus').length;

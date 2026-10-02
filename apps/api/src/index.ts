@@ -15,6 +15,7 @@ import { importRoutes } from './routes/import.js';
 import { meRoutes } from './routes/me.js';
 import { roomRoutes } from './routes/rooms.js';
 import { taskRoutes } from './routes/tasks.js';
+import { devRoutes } from './routes/dev.js';
 import { purgeExpiredImages } from './rooms/images.js';
 
 const app = Fastify({
@@ -48,6 +49,7 @@ await app.register(focusRoutes);
 await app.register(friendRoutes);
 await app.register(importRoutes);
 await app.register(roomRoutes);
+await app.register(devRoutes);
 
 await runMigrations();
 attachRealtime(app);

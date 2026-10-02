@@ -2,6 +2,7 @@ import { addDays, cairoDay, formatDuration } from '@zenfocus/shared';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import { Icon } from '../components/Icon';
+import { PageSkeleton } from '../components/Skeleton';
 import { api } from '../lib/api';
 import { RequireAccount } from './RequireAccount';
 
@@ -18,11 +19,13 @@ function level(seconds: number) {
 }
 
 const weekday = (day: string) => new Date(`${day}T12:00:00Z`).getUTCDay();
+const MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const ROW_LABELS = ['السبت', '', 'الاثنين', '', 'الأربعاء', '', ''];
 
 function Stats() {
   const q = useQuery({ queryKey: ['stats'], queryFn: api.stats });
   const s = q.data;
-  if (!s) return null;
+  if (!s) return <PageSkeleton blocks={[110, 230, 260]} />;
 
   const today = cairoDay(new Date());
   // 26 weeks of columns, each Saturday → Friday, ending with the current week.
@@ -59,15 +62,24 @@ function Stats() {
 
       <section className="kpis" aria-label="الأرقام">
         <div className="kpi">
-          <span className="label">إجمالي التركيز</span>
+          <span className="label">
+            <Icon name="timer" size={16} />
+            إجمالي التركيز
+          </span>
           <span className="value">{formatDuration(s.totalSeconds)}</span>
         </div>
         <div className="kpi">
-          <span className="label">المتوسط اليومي</span>
+          <span className="label">
+            <Icon name="chart" size={16} />
+            المتوسط اليومي
+          </span>
           <span className="value">{formatDuration(s.dailyAverageSeconds)}</span>
         </div>
         <div className="kpi">
-          <span className="label">أطول سلسلة أيام</span>
+          <span className="label">
+            <Icon name="flame" size={16} />
+            أطول سلسلة أيام
+          </span>
           <span className="value" style={{ color: 'var(--warm)' }}>
             {s.longestStreak}
             <small> يوم</small>
@@ -75,7 +87,10 @@ function Stats() {
           <span className="hint">الحالي: {s.currentStreak} يوم</span>
         </div>
         <div className="kpi">
-          <span className="label">جلسات مكتملة</span>
+          <span className="label">
+            <Icon name="check" size={16} />
+            جلسات مكتملة
+          </span>
           <span className="value">{s.sessions}</span>
         </div>
       </section>
@@ -91,19 +106,34 @@ function Stats() {
             <span>أكثر</span>
           </div>
         </div>
-        <div className="heat" role="img" aria-label="خريطة ساعات التركيز لآخر 6 شهور">
-          {[...weeks].reverse().map((week) => (
-            <div className="heat-col" key={week[0]}>
-              {week.map((day) => (
-                <span
-                  key={day}
-                  className="heat-cell"
-                  title={`${day}: ${formatDuration(s.days[day] ?? 0)}`}
-                  style={{ background: day > today ? 'transparent' : SHADES[level(s.days[day] ?? 0)] }}
-                />
-              ))}
-            </div>
-          ))}
+        <div className="heatmap" role="img" aria-label="خريطة ساعات التركيز لآخر 6 شهور">
+          <div className="heat-days" aria-hidden="true">
+            <span />
+            {ROW_LABELS.map((l, i) => (
+              <span key={i}>{l}</span>
+            ))}
+          </div>
+          <div className="heat-grid">
+            {weeks.map((week, w) => {
+              const month = Number(week[0]!.slice(5, 7)) - 1;
+              const prev = w ? Number(weeks[w - 1]![0]!.slice(5, 7)) - 1 : -1;
+              return (
+                <div className="heat-col" key={week[0]}>
+                  <span className="heat-month" aria-hidden="true">
+                    {month !== prev ? MONTHS[month] : ''}
+                  </span>
+                  {week.map((day) => (
+                    <span
+                      key={day}
+                      className="heat-cell"
+                      title={`${day}: ${formatDuration(s.days[day] ?? 0)}`}
+                      style={{ background: day > today ? 'transparent' : SHADES[level(s.days[day] ?? 0)] }}
+                    />
+                  ))}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { Avatar, Icon } from '../components/Icon';
+import { PageSkeleton } from '../components/Skeleton';
 import { ApiError, api } from '../lib/api';
 import { useMe } from '../lib/hooks';
 import { RequireAccount } from './RequireAccount';
@@ -15,14 +16,19 @@ const PERIODS: { id: LeaderboardPeriod; label: string }[] = [
 
 function Place({ row, rank }: { row: LeaderboardRow; rank: number }) {
   return (
-    <div className={`place${rank === 1 ? ' first' : ''}`}>
-      {rank === 1 ? <Icon name="trophy" size={24} label="المركز الأول" style={{ color: 'var(--warm)' }} /> : <span className="rank">#{rank}</span>}
-      <Avatar name={row.name} src={row.avatarUrl} id={row.userId} size={rank === 1 ? 68 : 56} />
-      <b>{row.isMe ? 'أنت' : row.name}</b>
-      <span className="hours">{formatDuration(row.seconds)}</span>
-      <span className="muted" style={{ fontSize: 12 }}>
-        {row.sessions} جلسة{row.streak ? ` · ${row.streak} أيام متتالية` : ''}
+    <div className={`place p${rank}`}>
+      <span className="medal-avatar">
+        <Avatar name={row.name} src={row.avatarUrl} id={row.userId} size={rank === 1 ? 72 : 58} />
+        <span className="medal num" aria-label={`المركز ${rank}`}>
+          {rank}
+        </span>
       </span>
+      <b>{row.isMe ? 'أنت' : row.name}</b>
+      <span className="hours num">{formatDuration(row.seconds)}</span>
+      <span className="muted" style={{ fontSize: 12 }}>
+        {row.sessions} جلسة
+      </span>
+      <span className="step" aria-hidden="true" />
     </div>
   );
 }
@@ -178,6 +184,7 @@ function Board() {
   const ahead = myIdx > 0 ? rows[myIdx - 1] : null;
   const gap = ahead ? ahead.seconds - rows[myIdx]!.seconds : 0;
   const [first, second, third] = rows;
+  if (q.isLoading) return <PageSkeleton blocks={[200, 90, 320]} />;
 
   return (
     <>

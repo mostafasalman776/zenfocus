@@ -183,3 +183,131 @@ a.kpi:hover, .room-link:hover { transform: translateY(-2px); border-color: var(-
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 @media (max-width: 900px) { .timer { padding-top: 58px; } }
+
+/* ---------- Podium ---------- */
+.podium { align-items: end; gap: 14px; }
+.podium .place { padding: 20px 12px 0; gap: 6px; overflow: hidden; border-radius: 22px; }
+.podium .place .step { display: block; width: 100%; margin-top: 10px; border-radius: 14px 14px 0 0; }
+.podium .p1 .step { height: 56px; background: linear-gradient(180deg, rgba(232, 184, 138, 0.28), rgba(232, 184, 138, 0.04)); }
+.podium .p2 .step { height: 36px; background: linear-gradient(180deg, rgba(199, 207, 214, 0.2), rgba(199, 207, 214, 0.03)); }
+.podium .p3 .step { height: 22px; background: linear-gradient(180deg, rgba(210, 162, 124, 0.2), rgba(210, 162, 124, 0.03)); }
+.podium .p1 { border-color: rgba(232, 184, 138, 0.4); }
+.medal-avatar { position: relative; display: inline-flex; border-radius: 50%; padding: 3px; }
+.p1 .medal-avatar { box-shadow: 0 0 0 2px #e8b88a, 0 0 28px rgba(232, 184, 138, 0.35); }
+.p2 .medal-avatar { box-shadow: 0 0 0 2px #c7cfd6; }
+.p3 .medal-avatar { box-shadow: 0 0 0 2px #d2a27c; }
+.medal {
+  position: absolute; bottom: -4px; inset-inline-end: -4px; width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: #0f1311;
+  border: 2px solid var(--bg);
+}
+.p1 .medal { background: #e8b88a; }
+.p2 .medal { background: #c7cfd6; }
+.p3 .medal { background: #d2a27c; }
+.podium .hours { font-size: 22px; font-weight: 500; }
+.podium .p1 .hours { font-size: 28px; color: var(--warm); }
+
+/* ---------- KPI icons ---------- */
+.kpi .label { display: flex; align-items: center; gap: 6px; }
+.kpi .label svg { color: var(--faint); }
+
+/* ---------- Heatmap ---------- */
+.heatmap { display: flex; gap: 8px; }
+.heat-days { display: grid; grid-template-rows: 18px repeat(7, 1fr); gap: 4px; font-size: 11px; color: var(--faint); white-space: nowrap; }
+.heat-days span { display: flex; align-items: center; }
+.heat-grid { flex: 1; display: grid; grid-template-columns: repeat(26, minmax(0, 1fr)); gap: 4px; }
+.heat-grid .heat-col { display: grid; grid-template-rows: 18px repeat(7, auto); gap: 4px; }
+.heat-grid .heat-cell { width: 100%; height: auto; aspect-ratio: 1; border-radius: 4px; }
+.heat-month { font-size: 11px; color: var(--faint); white-space: nowrap; overflow: visible; }
+@media (max-width: 700px) {
+  .heat-days { display: none; }
+  .heat-grid, .heat-grid .heat-col { gap: 2px; }
+  .heat-grid .heat-cell { border-radius: 2px; }
+  .heat-month { font-size: 9px; }
+}
+
+/* ---------- Room cards ---------- */
+.room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.room-card {
+  display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: var(--radius);
+  background: var(--glass); border: 1px solid var(--line); text-decoration: none; box-shadow: var(--shadow);
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.room-card:hover { transform: translateY(-3px); border-color: rgba(143, 191, 168, 0.35); }
+.room-badge {
+  width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft); color: var(--accent-hover); font-size: 20px; font-weight: 700;
+}
+.room-name { font-size: 16px; font-weight: 600; }
+.room-meta { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.room-role { margin-inline-start: auto; font-size: 12px; color: var(--warm); background: var(--warm-soft); padding: 2px 10px; border-radius: 999px; }
+
+/* ---------- Chat grouping ---------- */
+.msg-row { display: flex; flex-direction: column; gap: 14px; }
+.chat-list { gap: 10px; }
+.msg.grouped { margin-top: -6px; }
+.avatar-gap { width: 34px; flex-shrink: 0; }
+.day-sep { align-self: center; font-size: 12px; color: var(--faint); display: flex; align-items: center; gap: 10px; width: 100%; }
+.day-sep::before, .day-sep::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.msg-row:has(.msg.mine) { align-items: flex-end; }
+
+/* ---------- Loading + page entrance ---------- */
+.skeleton-page { display: flex; flex-direction: column; gap: 18px; }
+.skeleton {
+  display: block; border-radius: var(--radius); width: 100%;
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
+  background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+.main > * { animation: rise 0.45s var(--ease) both; }
+.main > *:nth-child(2) { animation-delay: 0.04s; }
+.main > *:nth-child(3) { animation-delay: 0.08s; }
+.main > *:nth-child(4) { animation-delay: 0.12s; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Sizing across devices ---------- */
+.label-short { display: none; }
+.segmented button { white-space: nowrap; }
+/* The ring also follows screen height so Start stays on screen. */
+.timer .ring { width: min(300px, 74vw, 42vh); }
+.zen .ring { width: min(440px, 80vw, 52vh); }
+
+@media (max-width: 900px) {
+  .page-head h1 { font-size: 22px; }
+  .page-head p { font-size: 13px; }
+  .page-head { gap: 10px; }
+  .timer { padding: 18px 14px 16px; gap: 16px; }
+  .timer-top { position: static; order: 99; }
+  .timer .ring .time { font-size: clamp(44px, 13vw, 64px); }
+  .round { width: 50px; height: 50px; }
+  .round.primary { width: 70px; height: 70px; }
+  .card { padding: 18px; }
+  .kpi .value { font-size: 22px; }
+  .podium .place { padding-top: 14px; }
+  .podium .hours { font-size: 17px; }
+  .podium .p1 .hours { font-size: 20px; }
+  .board-row { padding: 10px 8px; gap: 8px; }
+}
+@media (max-width: 420px) {
+  .label-long { display: none; }
+  .label-short { display: inline; }
+  .segmented button { padding: 8px 16px; }
+  .main { padding-inline: 12px; }
+  .sounds { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .today-strip { gap: 8px; }
+  .podium { gap: 8px; }
+  .podium .medal-avatar .avatar { width: 46px !important; height: 46px !important; }
+}
+/* Large screens: keep content centred instead of hugging the sidebar. */
+@media (min-width: 1500px) {
+  .main { margin-inline: auto; max-width: 1320px; }
+}
+@media (max-width: 900px) {
+  .timer .ring { width: min(280px, 70vw, 34vh); }
+  .chip { padding: 6px 12px; font-size: 13px; }
+  .current-task { padding: 6px 6px 6px 12px; }
+}
+.room-timer span { white-space: nowrap; }
+.room-timer > div:nth-child(2) > div:first-child { flex-wrap: wrap; gap: 4px 12px; }
+.heat-grid .heat-col { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.heat-month { width: 0; overflow: visible; }
