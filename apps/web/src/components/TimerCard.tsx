@@ -1,9 +1,10 @@
 import type { Task, TimerMode } from '@zenfocus/shared';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loadPref, savePref } from '../lib/guest';
 import { useWakeLock, wakeLockSupported } from '../lib/hooks';
 import { MODE_LABEL, useTimer } from '../stores/timer';
 import { Icon } from './Icon';
+import { ZenMode } from './ZenMode';
 
 const R = 148;
 const C = 2 * Math.PI * R;
@@ -19,7 +20,17 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [keepAwake, setKeepAwake] = useState(() => loadPref('keepAwake', false));
+  const [zen, setZen] = useState(false);
   useWakeLock(t.status === 'running', keepAwake);
+
+  // Show the countdown in the browser tab while it runs.
+  useEffect(() => {
+    const base = 'ZenFocus | مساحتك للتركيز';
+    document.title = t.status === 'idle' ? base : `${fmt(t.remaining)} · ${MODE_LABEL[t.mode]}`;
+    return () => {
+      document.title = base;
+    };
+  }, [t.remaining, t.status, t.mode]);
 
   const total = t.minutes[t.mode] * 60;
   const progress = total ? t.remaining / total : 0;
@@ -49,6 +60,12 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
 
   return (
     <section className="card timer" aria-label="التايمر">
+      {zen && <ZenMode tasks={tasks} signedIn={signedIn} onClose={() => setZen(false)} />}
+      <div className="timer-top">
+        <button type="button" className="icon-btn" aria-label="وضع التركيز الكامل" title="وضع التركيز الكامل" onClick={() => setZen(true)}>
+          <Icon name="maximize" size={18} />
+        </button>
+      </div>
       <div className="segmented" role="tablist" aria-label="نوع الجلسة">
         {(['focus', 'short', 'long'] as TimerMode[]).map((m) => (
           <button
@@ -64,7 +81,7 @@ export function TimerCard({ tasks, signedIn }: { tasks: Task[]; signedIn: boolea
         ))}
       </div>
 
-      <div className={`ring${t.mode === 'focus' ? '' : ' break'}`}>
+      <div className={`ring${t.mode === 'focus' ? '' : ' break'}${t.status === 'running' ? ' running' : ''}`}>
         <svg viewBox="0 0 320 320" aria-hidden="true">
           <circle className="track" cx="160" cy="160" r={R} fill="none" strokeWidth="10" />
           <circle

@@ -197,6 +197,15 @@ function Board() {
 
       <div className="lb-cols">
         <div className="stack">
+          {q.isSuccess && rows.length <= 1 && (
+            <section className="card empty-state" aria-label="ابدأ المنافسة">
+              <span className="empty-icon">
+                <Icon name="trophy" size={30} />
+              </span>
+              <h2>المنافسة أحلى مع صحابك</h2>
+              <p>ابعت لينك الدعوة اللي على الجنب لصحابك. أول ما حد يسجل منه هتلاقوا نفسكم في نفس الترتيب، وكل دقيقة تركيز بتفرق.</p>
+            </section>
+          )}
           {rows.length > 1 && (
             <section className="podium" aria-label="الأوائل">
               {second ? <Place row={second} rank={2} /> : <div />}
@@ -204,7 +213,7 @@ function Board() {
               {third ? <Place row={third} rank={3} /> : <div />}
             </section>
           )}
-          {myIdx >= 0 && (
+          {myIdx >= 0 && rows.length > 1 && (
             <section className="card" aria-label="ترتيبك" style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
               <span className="num" style={{ fontSize: 40, color: 'var(--accent)' }}>
                 #{myIdx + 1}
@@ -225,6 +234,7 @@ function Board() {
               </Link>
             </section>
           )}
+          {rows.length > 1 && (
           <section className="card board" aria-label="الترتيب">
             <div className="board-row head">
               <span>#</span>
@@ -248,6 +258,7 @@ function Board() {
               </div>
             ))}
           </section>
+          )}
         </div>
         <Friends />
       </div>

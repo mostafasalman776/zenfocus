@@ -14,6 +14,7 @@ import { StatsPage } from './pages/StatsPage';
 import { WelcomePage } from './pages/WelcomePage';
 import './styles/app.css';
 import './styles/rooms.css';
+import './styles/polish.css';
 
 document.documentElement.dataset.theme = loadPref('theme', 'dark');
 

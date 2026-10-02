@@ -177,7 +177,7 @@ export function formatDuration(seconds: number): string {
   const m = Math.floor((seconds % 3600) / 60);
   if (h && m) return `${h}س ${m}د`;
   if (h) return `${h}س`;
-  return `${m}د`;
+  return m ? `${m}د` : '0 دقيقة';
 }
 
 // ---------- Rooms, chat, images (phase 2) ----------

@@ -41,7 +41,7 @@
 .msg.mine .bubble { border-radius: 14px 4px 14px 14px; background: var(--accent); color: var(--on-accent); }
 .bubble.deleted, .msg.mine .bubble.deleted { background: transparent; border: 1px dashed var(--line-strong); color: var(--faint); font-style: italic; }
 .msg-reply { font-size: 12px; color: var(--muted); border-inline-start: 2px solid var(--accent); padding-inline-start: 8px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.msg-image { margin: 0; border-radius: 12px; overflow: hidden; background: var(--surface-2); max-width: 260px; }
+.msg-image { margin: 0; border-radius: 12px; overflow: hidden; background: var(--surface-2); width: min(260px, 60vw); }
 .msg-image img { display: block; width: 100%; height: auto; max-height: 320px; object-fit: cover; }
 .msg-image figcaption { padding: 6px 10px; font-size: 11px; color: var(--muted); direction: ltr; text-align: right; }
 .msg-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; }

@@ -1,5 +1,7 @@
 import { addDays, cairoDay, formatDuration } from '@zenfocus/shared';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router';
+import { Icon } from '../components/Icon';
 import { api } from '../lib/api';
 import { RequireAccount } from './RequireAccount';
 
@@ -42,6 +44,19 @@ function Stats() {
           <p>كل جلسة خلصتها من أول ما سجلت، ومعاها جلسات الزائر اللي اتنقلت</p>
         </div>
       </header>
+
+      {s.totalSeconds === 0 && (
+        <section className="card empty-state" aria-label="لسه مفيش إحصائيات">
+          <span className="empty-icon">
+            <Icon name="chart" size={30} />
+          </span>
+          <h2>إحصائياتك هتبان هنا</h2>
+          <p>كل جلسة تركيز بتكملها بتظهر هنا: أيامك، وأطول ستريك، ووقتك رايح على أنهي مادة. ابدأ أول جلسة دلوقتي.</p>
+          <Link className="btn" to="/">
+            ابدأ جلسة
+          </Link>
+        </section>
+      )}
 
       <section className="kpis" aria-label="الأرقام">
         <div className="kpi">

@@ -129,9 +129,12 @@ export function Layout() {
           )}
         </nav>
         <div className="side-spacer" />
-        <div className="legal-links">
-          <NavLink to="/privacy">الخصوصية</NavLink>
-          <NavLink to="/terms">الشروط</NavLink>
+        <div className="side-foot">
+          <div className="legal-links">
+            <NavLink to="/privacy">الخصوصية</NavLink>
+            <NavLink to="/terms">الشروط</NavLink>
+          </div>
+          <ThemeToggle />
         </div>
         {me ? (
           <div className="me-row">
