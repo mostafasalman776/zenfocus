@@ -300,3 +300,13 @@ h1, h2, h3, p { margin: 0; }
 @media (max-width: 900px) { .desktop-only { display: none; } }
 /* On phones the timer comes first; today's numbers follow it. */
 @media (max-width: 900px) { .focus-kpis { order: 1; } }
+
+/* ---------- Legal pages ---------- */
+.legal { max-width: 760px; display: flex; flex-direction: column; gap: 12px; line-height: 1.9; }
+.legal h1 { font-size: 26px; }
+.legal h2 { font-size: 18px; margin-top: 10px; }
+.legal ul { margin: 0; padding-inline-start: 22px; display: flex; flex-direction: column; gap: 6px; }
+.legal a { color: var(--accent-hover); }
+.legal-links { display: flex; gap: 14px; padding: 0 14px; font-size: 12px; }
+.legal-links a { color: var(--faint); text-decoration: none; }
+.legal-links a:hover { color: var(--text-2); }

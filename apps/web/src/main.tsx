@@ -6,6 +6,7 @@ import { Layout } from './components/Layout';
 import { loadPref, saveInvite } from './lib/guest';
 import { FocusPage } from './pages/FocusPage';
 import { LeaderboardPage } from './pages/LeaderboardPage';
+import { PrivacyPage, TermsPage } from './pages/LegalPages';
 import { AdminPage } from './pages/AdminPage';
 import { RoomPage } from './pages/RoomPage';
 import { JoinRoomPage, RoomsPage } from './pages/RoomsPage';
@@ -37,6 +38,8 @@ const router = createBrowserRouter([
       { path: '/admin', element: <AdminPage /> },
       { path: '/leaderboard', element: <LeaderboardPage /> },
       { path: '/stats', element: <StatsPage /> },
+      { path: '/privacy', element: <PrivacyPage /> },
+      { path: '/terms', element: <TermsPage /> },
       { path: '*', element: <Navigate to="/" replace /> }
     ]
   }

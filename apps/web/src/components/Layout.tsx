@@ -129,6 +129,10 @@ export function Layout() {
           )}
         </nav>
         <div className="side-spacer" />
+        <div className="legal-links">
+          <NavLink to="/privacy">الخصوصية</NavLink>
+          <NavLink to="/terms">الشروط</NavLink>
+        </div>
         {me ? (
           <div className="me-row">
             <Avatar name={me.name} src={me.avatarUrl} id={me.id} />
