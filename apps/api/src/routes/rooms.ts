@@ -9,6 +9,7 @@ import { env } from '../env.js';
 import { leaderboard } from '../lib/aggregates.js';
 import { emitRoom, evict } from '../realtime/hub.js';
 import { BadImage, imageFile, purgeRoomImages, storeImage, verifySignature } from '../rooms/images.js';
+import { removeFromVoice, voiceToken } from '../rooms/voice.js';
 import {
   allow,
   getMessage,
@@ -105,6 +106,7 @@ export async function roomRoutes(app: FastifyInstance) {
       if (!mem) return notMember(reply);
       if (mem.role !== 'owner') return reply.code(403).send({ error: 'owner_only' });
       await evict(id, null);
+      await removeFromVoice(id, null);
       await purgeRoomImages(id);
       await db.delete(rooms).where(eq(rooms.id, id));
       return { ok: true };
@@ -156,6 +158,7 @@ export async function roomRoutes(app: FastifyInstance) {
       if (mem.role === 'owner') return reply.code(422).send({ error: 'owner_cannot_leave' });
       await db.delete(rm).where(and(eq(rm.roomId, id), eq(rm.userId, me.id)));
       await evict(id, me.id);
+      await removeFromVoice(id, me.id);
       await systemMessage(id, `${me.name} خرج من الغرفة`);
       emitRoom(id, 'room:members', {});
       return { ok: true };
@@ -170,6 +173,7 @@ export async function roomRoutes(app: FastifyInstance) {
       const removed = await db.delete(rm).where(and(eq(rm.roomId, id), eq(rm.userId, userId))).returning();
       if (removed.length) {
         await evict(id, userId);
+        await removeFromVoice(id, userId);
         emitRoom(id, 'room:members', {});
       }
       return { ok: true };
@@ -202,6 +206,14 @@ export async function roomRoutes(app: FastifyInstance) {
       const timer = timerOf(updated!);
       emitRoom(id, 'room:timer', timer);
       return { timer };
+    });
+
+    auth.post('/api/rooms/:id/voice', async (request, reply) => {
+      const me = currentUser(request);
+      const { id } = idParam.parse(request.params);
+      if (!(await membership(id, me.id))) return notMember(reply);
+      if (!env.voiceEnabled) return reply.code(503).send({ error: 'voice_disabled' });
+      return voiceToken(id, me);
     });
 
     auth.get('/api/rooms/:id/leaderboard', async (request, reply) => {

@@ -9,3 +9,5 @@ apps/api/uploads/
 .DS_Store
 Thumbs.db
 deploy/ssl/
+deploy/livekit.yaml
+deploy/acme-webroot/

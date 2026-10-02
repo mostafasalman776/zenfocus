@@ -70,3 +70,16 @@
   .chat { height: calc(100dvh - 330px); }
   .room-time { font-size: 36px; }
 }
+
+/* ---------- Voice ---------- */
+.voice { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; background: var(--bg-side); }
+.voice-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex-shrink: 0; }
+.voice-dot.on { background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.voice-info { display: flex; flex-direction: column; flex: 1 1 180px; min-width: 0; }
+.voice-info span { font-size: 12px; }
+.voice-people { display: flex; gap: 6px; flex-wrap: wrap; }
+.voice-person { position: relative; border-radius: 50%; padding: 2px; }
+.voice-person.speaking { box-shadow: 0 0 0 2px var(--accent); }
+.voice-muted { position: absolute; bottom: -2px; inset-inline-end: -2px; width: 16px; height: 16px; border-radius: 50%; background: var(--danger-bg); color: var(--danger); display: flex; align-items: center; justify-content: center; }
+.round.small { width: 44px; height: 44px; }
+.round.off { background: var(--danger-bg); color: var(--danger); border-color: transparent; }

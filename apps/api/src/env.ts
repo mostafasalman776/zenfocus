@@ -17,7 +17,11 @@ const schema = z.object({
   /** When set (e.g. /_zf_uploads/), images are served by Nginx via X-Accel-Redirect. */
   ACCEL_REDIRECT_PREFIX: z.string().optional(),
   /** Comma-separated usernames allowed to review reports. */
-  ADMIN_USERNAMES: z.string().default('')
+  ADMIN_USERNAMES: z.string().default(''),
+  /** LiveKit (voice). Leave empty to disable voice. */
+  LIVEKIT_URL: z.preprocess((v) => v || undefined, z.string().url().optional()),
+  LIVEKIT_API_KEY: z.preprocess((v) => v || undefined, z.string().optional()),
+  LIVEKIT_API_SECRET: z.preprocess((v) => v || undefined, z.string().optional())
 });
 
 const parsed = schema.parse(process.env);
@@ -27,6 +31,7 @@ export const env = {
   isProd: parsed.NODE_ENV === 'production',
   devLogin: parsed.NODE_ENV !== 'production' && parsed.DEV_LOGIN === '1',
   googleEnabled: Boolean(parsed.GOOGLE_CLIENT_ID && parsed.GOOGLE_CLIENT_SECRET),
+  voiceEnabled: Boolean(parsed.LIVEKIT_URL && parsed.LIVEKIT_API_KEY && parsed.LIVEKIT_API_SECRET),
   imageSecret: parsed.IMAGE_SECRET ?? randomBytes(32).toString('hex'),
   admins: new Set(
     parsed.ADMIN_USERNAMES.split(',')

@@ -95,6 +95,7 @@ export const api = {
   kick: (id: string, userId: string) => request('DELETE', `/api/rooms/${id}/members/${userId}`),
   roomTimer: (id: string, action: 'start' | 'pause' | 'reset' | 'skip') =>
     request<{ timer: RoomTimer }>('POST', `/api/rooms/${id}/timer`, { action }),
+  voiceToken: (id: string) => request<{ url: string; token: string }>('POST', `/api/rooms/${id}/voice`),
   roomLeaderboard: (id: string, period: LeaderboardPeriod) =>
     request<{ period: LeaderboardPeriod; rows: LeaderboardRow[] }>('GET', `/api/rooms/${id}/leaderboard?period=${period}`),
   messages: (id: string, before?: string) =>

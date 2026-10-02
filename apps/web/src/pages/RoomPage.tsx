@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Chat } from '../components/Chat';
+import { VoiceBar } from '../components/VoiceBar';
 import { Avatar, Icon } from '../components/Icon';
 import { api } from '../lib/api';
 import { loadPref, savePref } from '../lib/guest';
@@ -329,6 +330,7 @@ function Room({ id }: { id: string }) {
           </div>
         </header>
         <TimerBar room={room} follow={follow} setFollow={setFollow} />
+        <VoiceBar roomId={room.id} />
         <div className="segmented room-tabs" role="tablist">
           <button type="button" role="tab" aria-selected={tab === 'chat'} onClick={() => setTab('chat')}>
             الشات
