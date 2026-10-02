@@ -16,8 +16,9 @@ const schema = z.object({
   IMAGE_SECRET: z.preprocess((v) => v || undefined, z.string().min(32).optional()),
   /** When set (e.g. /_zf_uploads/), images are served by Nginx via X-Accel-Redirect. */
   ACCEL_REDIRECT_PREFIX: z.string().optional(),
-  /** Comma-separated usernames allowed to review reports. */
+  /** Platform admins: comma-separated usernames and/or Google emails. */
   ADMIN_USERNAMES: z.string().default(''),
+  ADMIN_EMAILS: z.string().default(''),
   /** LiveKit (voice). Leave empty to disable voice. */
   LIVEKIT_URL: z.preprocess((v) => v || undefined, z.string().url().optional()),
   LIVEKIT_API_KEY: z.preprocess((v) => v || undefined, z.string().optional()),
@@ -34,11 +35,18 @@ export const env = {
   voiceEnabled: Boolean(parsed.LIVEKIT_URL && parsed.LIVEKIT_API_KEY && parsed.LIVEKIT_API_SECRET),
   imageSecret: parsed.IMAGE_SECRET ?? randomBytes(32).toString('hex'),
   admins: new Set(
-    parsed.ADMIN_USERNAMES.split(',')
+    `${parsed.ADMIN_USERNAMES},${parsed.ADMIN_EMAILS}`
+      .split(',')
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean)
   )
 };
+
+export function isAdminUser(u: { username: string | null; email: string | null }): boolean {
+  return Boolean(
+    (u.username && env.admins.has(u.username.toLowerCase())) || (u.email && env.admins.has(u.email.toLowerCase()))
+  );
+}
 
 if (env.isProd && !env.DATABASE_URL) throw new Error('DATABASE_URL is required in production');
 if (env.isProd && !parsed.IMAGE_SECRET) throw new Error('IMAGE_SECRET is required in production');

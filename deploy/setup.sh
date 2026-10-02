@@ -31,6 +31,7 @@ UPLOAD_DIR=$API_DIR/uploads
 IMAGE_SECRET=$(openssl rand -hex 32)
 ACCEL_REDIRECT_PREFIX=/_zf_uploads/
 ADMIN_USERNAMES=
+ADMIN_EMAILS=
 # Paste these from Google Cloud Console, then: pm2 reload zenfocus-api --update-env
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=

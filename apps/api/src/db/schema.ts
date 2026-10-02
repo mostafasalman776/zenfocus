@@ -24,6 +24,8 @@ export const users = pgTable(
     avatarUrl: text('avatar_url'),
     inviteCode: text('invite_code').notNull(),
     dailyGoalSeconds: integer('daily_goal_seconds').notNull().default(4 * 3600),
+    /** Set by a platform admin; a banned user cannot sign in. */
+    bannedAt: timestamp('banned_at', { withTimezone: true }),
     createdAt: createdAt()
   },
   (t) => [

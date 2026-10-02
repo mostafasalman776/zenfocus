@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { and, eq, gt } from 'drizzle-orm';
+import { and, eq, gt, isNull } from 'drizzle-orm';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { db, schema } from '../db/index.js';
 import { env } from '../env.js';
@@ -30,7 +30,13 @@ export async function userFromToken(token: string | undefined): Promise<User | n
     .select({ user: schema.users })
     .from(schema.authSessions)
     .innerJoin(schema.users, eq(schema.users.id, schema.authSessions.userId))
-    .where(and(eq(schema.authSessions.id, hash(token)), gt(schema.authSessions.expiresAt, new Date())))
+    .where(
+      and(
+        eq(schema.authSessions.id, hash(token)),
+        gt(schema.authSessions.expiresAt, new Date()),
+        isNull(schema.users.bannedAt)
+      )
+    )
     .limit(1);
   return rows[0]?.user ?? null;
 }

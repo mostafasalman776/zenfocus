@@ -13,7 +13,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { currentUser, requireUser, type User } from '../auth/session.js';
 import { db, schema, tzSql } from '../db/index.js';
-import { env } from '../env.js';
+import { isAdminUser } from '../env.js';
 import { dailyTotals, leaderboard } from '../lib/aggregates.js';
 import { friendIds } from '../lib/friends.js';
 
@@ -23,7 +23,7 @@ export const toMe = (u: User): Me => ({
   username: u.username,
   avatarUrl: u.avatarUrl,
   inviteCode: u.inviteCode,
-  isAdmin: Boolean(u.username && env.admins.has(u.username))
+  isAdmin: isAdminUser(u)
 });
 
 const fs = schema.focusSessions;

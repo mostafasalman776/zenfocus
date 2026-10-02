@@ -1,4 +1,7 @@
 import type {
+  AdminOverview,
+  AdminRoom,
+  AdminUser,
   ChatMessage,
   FocusSession,
   RoomDetail,
@@ -126,6 +129,13 @@ export const api = {
     ),
   resolveReport: (id: string, deleteMessage: boolean) =>
     request('POST', `/api/admin/reports/${id}/resolve`, { deleteMessage }),
+  adminOverview: () => request<AdminOverview>('GET', '/api/admin/overview'),
+  adminUsers: (q: string, offset = 0) =>
+    request<{ users: AdminUser[]; total: number }>('GET', `/api/admin/users?q=${encodeURIComponent(q)}&offset=${offset}`),
+  adminBan: (id: string, banned: boolean) => request('POST', `/api/admin/users/${id}/ban`, { banned }),
+  adminDeleteUser: (id: string) => request('DELETE', `/api/admin/users/${id}`),
+  adminRooms: () => request<{ rooms: AdminRoom[] }>('GET', '/api/admin/rooms'),
+  adminDeleteRoom: (id: string) => request('DELETE', `/api/admin/rooms/${id}`),
 
   importGuest: (data: { tasks: GuestTaskImport[]; sessions: GuestSessionImport[] }) =>
     request<{ tasks: number; sessions: number }>('POST', '/api/import/guest', data)

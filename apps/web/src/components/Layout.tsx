@@ -128,8 +128,8 @@ export function Layout() {
           ))}
           {me?.isAdmin && (
             <NavLink to="/admin">
-              <Icon name="flag" />
-              البلاغات
+              <Icon name="settings" />
+              لوحة التحكم
             </NavLink>
           )}
         </nav>
@@ -194,7 +194,7 @@ export function Layout() {
             <div className="account-links">
               <NavLink to="/privacy" onClick={() => setAccountOpen(false)}>سياسة الخصوصية</NavLink>
               <NavLink to="/terms" onClick={() => setAccountOpen(false)}>شروط الاستخدام</NavLink>
-              {me.isAdmin && <NavLink to="/admin" onClick={() => setAccountOpen(false)}>البلاغات</NavLink>}
+              {me.isAdmin && <NavLink to="/admin" onClick={() => setAccountOpen(false)}>لوحة التحكم</NavLink>}
             </div>
             <button type="button" className="btn danger" onClick={() => { setAccountOpen(false); void logout(); }}>
               <Icon name="logout" size={18} />

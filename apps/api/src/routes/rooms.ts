@@ -5,7 +5,7 @@ import type { FastifyInstance, FastifyReply } from 'fastify';
 import { z } from 'zod';
 import { currentUser, newInviteCode, requireUser } from '../auth/session.js';
 import { db, schema } from '../db/index.js';
-import { env } from '../env.js';
+import { env, isAdminUser } from '../env.js';
 import { leaderboard } from '../lib/aggregates.js';
 import { emitRoom, evict } from '../realtime/hub.js';
 import { BadImage, imageFile, purgeRoomImages, storeImage, verifySignature } from '../rooms/images.js';
@@ -311,10 +311,8 @@ export async function roomRoutes(app: FastifyInstance) {
 
     // ---------- Admin: reports ----------
 
-    const isAdmin = (username: string | null) => Boolean(username && env.admins.has(username));
-
     auth.get('/api/admin/reports', async (request, reply) => {
-      if (!isAdmin(currentUser(request).username)) return reply.code(403).send({ error: 'forbidden' });
+      if (!isAdminUser(currentUser(request))) return reply.code(403).send({ error: 'forbidden' });
       const rows = await db
         .select({ id: schema.reports.id, reason: schema.reports.reason, createdAt: schema.reports.createdAt, messageId: schema.reports.messageId })
         .from(schema.reports)
@@ -327,7 +325,7 @@ export async function roomRoutes(app: FastifyInstance) {
     });
 
     auth.post('/api/admin/reports/:id/resolve', async (request, reply) => {
-      if (!isAdmin(currentUser(request).username)) return reply.code(403).send({ error: 'forbidden' });
+      if (!isAdminUser(currentUser(request))) return reply.code(403).send({ error: 'forbidden' });
       const { id } = idParam.parse(request.params);
       const { deleteMessage } = z.object({ deleteMessage: z.boolean().default(false) }).parse(request.body ?? {});
       const [report] = await db.update(schema.reports).set({ resolvedAt: new Date() }).where(eq(schema.reports.id, id)).returning();

@@ -75,3 +75,22 @@ export async function evict(roomId: string, userId: string | null) {
     leave(roomId, s.data.userId as string);
   }
 }
+
+/** Distinct signed-in users with at least one open socket. */
+export function onlineCount(): number {
+  if (!io) return 0;
+  const ids = new Set<string>();
+  for (const s of io.of('/').sockets.values()) ids.add(s.data.userId as string);
+  return ids.size;
+}
+
+export function presentCount(roomId: string): number {
+  return present.get(roomId)?.size ?? 0;
+}
+
+/** Drop every socket of a user (banned or deleted by an admin). */
+export async function disconnectUser(userId: string) {
+  if (!io) return;
+  const sockets = await io.in(`user:${userId}`).fetchSockets();
+  for (const s of sockets) s.disconnect(true);
+}

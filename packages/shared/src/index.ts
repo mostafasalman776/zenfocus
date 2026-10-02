@@ -284,3 +284,40 @@ export interface ChatMessage {
   editedAt: string | null;
   deleted: boolean;
 }
+
+// ---------- Platform admin ----------
+
+export interface AdminOverview {
+  users: { total: number; new1d: number; new7d: number; new30d: number; banned: number };
+  activity: { onlineNow: number; focusingNow: number; activeToday: number; active7d: number; active30d: number };
+  focus: { totalSeconds: number; sessions: number; todaySeconds: number };
+  rooms: { total: number; messages: number; messagesToday: number };
+  images: { count: number; bytes: number; originalBytes: number };
+  openReports: number;
+  /** Last 30 Cairo days, oldest first. */
+  daily: { day: string; signups: number; focusSeconds: number; activeUsers: number }[];
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  username: string | null;
+  email: string | null;
+  avatarUrl: string | null;
+  createdAt: string;
+  bannedAt: string | null;
+  lastActiveAt: string | null;
+  totalSeconds: number;
+  sessions: number;
+  isAdmin: boolean;
+}
+
+export interface AdminRoom {
+  id: string;
+  name: string;
+  ownerName: string;
+  members: number;
+  messages: number;
+  liveNow: number;
+  createdAt: string;
+}

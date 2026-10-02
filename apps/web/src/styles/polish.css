@@ -504,3 +504,39 @@ button, .quick, .chat-peek, .segmented, .mobile-nav { -webkit-user-select: none;
   .mobile-nav { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
   .app { min-height: 100dvh; }
 }
+
+/* ---------- Admin dashboard ---------- */
+.admin { display: flex; flex-direction: column; gap: 20px; }
+.admin .card-head { flex-wrap: wrap; }
+.admin-chart { display: flex; align-items: flex-end; gap: 4px; height: 180px; padding-top: 8px; }
+.admin-bar { flex: 1; min-width: 0; background: var(--accent); border-radius: 4px 4px 2px 2px; opacity: .85; }
+.admin-bar:last-child { opacity: 1; }
+.admin-note { font-size: 13px; }
+.admin-search { max-width: 320px; flex: 1 1 220px; }
+.admin-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.admin-rows li { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid var(--line); }
+.admin-rows li:first-child { border-top: none; }
+.admin-rows li.banned { opacity: .6; }
+.admin-who { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1.2; }
+.admin-who b { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.admin-who .muted, .admin-meta .muted { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
+.admin-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.admin-actions .btn { padding: 8px 14px; font-size: 13px; }
+.admin-pager { display: flex; align-items: center; justify-content: center; gap: 14px; padding-top: 14px; }
+.pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.pill.danger { background: var(--danger-bg); color: var(--danger); }
+.pill.live { background: var(--accent); color: var(--on-accent); }
+@media (max-width: 900px) {
+  .admin { gap: 14px; }
+  .admin .page-head .segmented { width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .admin .page-head .segmented::-webkit-scrollbar { display: none; }
+  .admin .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .admin-chart { height: 130px; gap: 2px; }
+  .admin-rows li { flex-wrap: wrap; gap: 10px; }
+  .admin-who { flex-basis: calc(100% - 52px); }
+  .admin-meta { flex-basis: 100%; }
+  .admin-actions { width: 100%; }
+  .admin-actions .btn { flex: 1; }
+  .admin-search { max-width: none; }
+}

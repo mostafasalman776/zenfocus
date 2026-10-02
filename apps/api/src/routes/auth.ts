@@ -112,6 +112,7 @@ export async function authRoutes(app: FastifyInstance) {
       request.cookies[INVITE_COOKIE]
     );
     reply.clearCookie(INVITE_COOKIE, { path: '/' });
+    if (user.bannedAt) return reply.redirect(`${env.APP_ORIGIN}/?login=banned`);
     await createSession(reply, user.id);
     return reply.redirect(`${env.APP_ORIGIN}${user.username ? '/?login=ok' : '/welcome'}`);
   });
