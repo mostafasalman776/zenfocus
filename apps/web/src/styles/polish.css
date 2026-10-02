@@ -18,28 +18,21 @@
 }
 
 /* ---------- Atmosphere: the soft glow of the original ZenFocus ---------- */
-body::before,
-body::after {
-  content: '';
-  position: fixed;
-  z-index: -1;
-  width: 60vmax;
-  height: 60vmax;
-  border-radius: 50%;
-  filter: blur(90px);
-  pointer-events: none;
-  transition: opacity 1.2s var(--ease);
+/* Static gradients: no blur filter, so phones do not re-composite huge blurred layers. */
+body {
+  background:
+    radial-gradient(60vmax 60vmax at 100% 0%, var(--glow-1), transparent 70%),
+    radial-gradient(55vmax 55vmax at 0% 100%, var(--glow-2), transparent 70%),
+    var(--bg);
+  background-repeat: no-repeat;
+  min-height: 100vh;
 }
-body::before { background: var(--glow-1); top: -25vmax; inset-inline-start: -15vmax; }
-body::after { background: var(--glow-2); bottom: -30vmax; inset-inline-end: -10vmax; }
-body { background: var(--bg); isolation: isolate; }
 .app, .side { background: transparent; }
-.side { background: color-mix(in srgb, var(--bg-side) 70%, transparent); backdrop-filter: blur(18px); }
+.side { background: color-mix(in srgb, var(--bg-side) 88%, transparent); }
 
 /* ---------- Depth ---------- */
 .card, .kpi, .member, .chat, .room-link {
   background: var(--glass);
-  backdrop-filter: blur(16px);
   box-shadow: var(--shadow);
   transition: border-color 0.25s var(--ease), transform 0.25s var(--ease), background 0.25s var(--ease);
 }
@@ -82,9 +75,7 @@ a.kpi:hover, .room-link:hover { transform: translateY(-2px); border-color: var(-
 .timer-top .icon-btn:hover { background: var(--surface-2); color: var(--text); }
 
 /* Running: the ring breathes and glows. */
-.ring .progress { filter: drop-shadow(0 0 0 transparent); transition: stroke-dashoffset 0.9s linear, filter 0.6s var(--ease); }
-.ring.running .progress { filter: drop-shadow(0 0 10px rgba(143, 191, 168, 0.45)); }
-.ring.running.break .progress { filter: drop-shadow(0 0 10px rgba(232, 184, 138, 0.45)); }
+.ring .progress { transition: stroke-dashoffset 0.9s linear; }
 .ring.running::after {
   content: '';
   position: absolute;
@@ -96,9 +87,11 @@ a.kpi:hover, .room-link:hover { transform: translateY(-2px); border-color: var(-
 }
 .ring.running.break::after { background: radial-gradient(circle, var(--warm-soft), transparent 70%); }
 @keyframes breathe {
-  0%, 100% { transform: scale(0.92); opacity: 0.55; }
-  50% { transform: scale(1.04); opacity: 1; }
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
 }
+.ring.running::after { will-change: opacity; }
+@media (hover: none) { .ring.running::after { animation: none; opacity: 0.7; } }
 .round.primary { box-shadow: 0 10px 34px -6px rgba(143, 191, 168, 0.45); }
 .round.primary:hover { transform: translateY(-1px); }
 
@@ -378,7 +371,6 @@ a.kpi:hover, .room-link:hover { transform: translateY(-2px); border-color: var(-
 .table-ring .track { stroke: var(--surface-2); }
 .table-ring .progress { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset 0.9s linear; }
 .table-ring.break .progress { stroke: var(--warm); }
-.table-ring.running .progress { filter: drop-shadow(0 0 4px rgba(143, 191, 168, 0.5)); }
 .table-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; pointer-events: none; }
 .table-time { font-size: clamp(30px, 10vw, 40px); font-weight: 300; direction: ltr; }
 .table-phase { font-size: 12px; color: var(--muted); }
