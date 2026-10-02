@@ -30,7 +30,7 @@ function RoomList() {
           <h1>الغرف</h1>
         </div>
       </header>
-      <div className="cols" style={{ gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 360px)' }}>
+      <div className="cols rooms-cols">
         <section className="card" aria-label="غرفي">
           <div className="card-head">
             <h2>غرفي</h2>
