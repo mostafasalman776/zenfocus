@@ -10,12 +10,14 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Chat } from '../components/Chat';
+import { Sheet } from '../components/Sheet';
+import { CheerButtons, StudyTable, type CheerBurst, type CheerKind } from '../components/StudyTable';
 import { VoiceBar } from '../components/VoiceBar';
 import { Avatar, Icon } from '../components/Icon';
 import { PageSkeleton } from '../components/Skeleton';
 import { api } from '../lib/api';
 import { loadPref, savePref } from '../lib/guest';
-import { getSocket, useMe } from '../lib/hooks';
+import { getSocket, useIsMobile, useMe } from '../lib/hooks';
 import { useTimer } from '../stores/timer';
 import { RequireAccount } from './RequireAccount';
 
@@ -178,6 +180,9 @@ function Room({ id }: { id: string }) {
   const [tab, setTab] = useState<'chat' | 'members'>('chat');
   const [follow, setFollowState] = useState(() => loadPref(`follow.${id}`, false));
   const eventId = useRef(0);
+  const isMobile = useIsMobile();
+  const [bursts, setBursts] = useState<CheerBurst[]>([]);
+  const [chatOpen, setChatOpen] = useState(false);
   const setFollow = (v: boolean) => {
     setFollowState(v);
     savePref(`follow.${id}`, v);
@@ -227,6 +232,11 @@ function Room({ id }: { id: string }) {
     const onTimer = (timer: RoomTimer) => patchRoom((r) => ({ ...r, timer }));
     const refetch = () => void qc.invalidateQueries({ queryKey: ['room', id] });
     const onEvent = (e: { text: string }) => setEvents((list) => [...list.slice(-4), { id: ++eventId.current, text: e.text }]);
+    const onCheer = (c: { userId: string; name: string; kind: CheerKind }) => {
+      const burst = { id: ++eventId.current, userId: c.userId, kind: c.kind };
+      setBursts((list) => [...list.slice(-11), burst]);
+      setTimeout(() => setBursts((list) => list.filter((b) => b.id !== burst.id)), 1800);
+    };
     const onRemoved = (e: { roomId: string }) => {
       if (e.roomId !== id) return;
       void qc.invalidateQueries({ queryKey: ['rooms'] });
@@ -241,7 +251,9 @@ function Room({ id }: { id: string }) {
     s.on('room:updated', refetch);
     s.on('room:event', onEvent);
     s.on('room:removed', onRemoved);
+    s.on('room:cheer', onCheer);
     return () => {
+      s.off('room:cheer', onCheer);
       s.emit('room:leave');
       s.off('connect', join);
       s.off('chat:message', onMessage);
@@ -278,6 +290,79 @@ function Room({ id }: { id: string }) {
 
   const inviteUrl = `${location.origin}/r/${room.inviteCode}`;
   const focusing = room.members.filter((m) => m.status === 'focus').length;
+  const chat = (
+    <Chat
+      roomId={room.id}
+      me={me}
+      role={room.role}
+      messages={messages}
+      hasMore={hasMore}
+      events={events}
+      typing={Object.values(typing).map((t) => t.name)}
+      onLoadMore={async () => {
+        const first = messages[0];
+        if (!first) return;
+        const r = await api.messages(id, first.createdAt);
+        setMessages((list) => [...r.messages, ...list]);
+        setHasMore(r.messages.length >= 50);
+      }}
+    />
+  );
+
+  if (isMobile) {
+    const recent = messages.filter((m) => m.kind !== 'system' && !m.deleted).slice(-3);
+    return (
+      <div className="m-room">
+        <header className="m-room-head">
+          <button type="button" className="icon-btn" aria-label="رجوع" onClick={() => navigate('/rooms')}>
+            <Icon name="arrowRight" size={20} />
+          </button>
+          <div className="m-room-title">
+            <h1>{room.name}</h1>
+            <span className="muted">
+              {room.memberCount} أعضاء · {focusing} يركّزون
+            </span>
+          </div>
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="نسخ رابط الدعوة"
+            onClick={() => void navigator.clipboard?.writeText(inviteUrl).then(() => window.alert('تم نسخ رابط الدعوة'))}
+          >
+            <Icon name="userPlus" size={20} />
+          </button>
+        </header>
+        <StudyTable room={room} meId={me.id} bursts={bursts} follow={follow} setFollow={setFollow} />
+        <div className="m-room-actions">
+          <div className="m-voice">
+            <VoiceBar roomId={room.id} />
+          </div>
+          <CheerButtons />
+        </div>
+        <button type="button" className="chat-peek" onClick={() => setChatOpen(true)} aria-label="فتح المحادثة">
+          <span className="peek-head">
+            <Icon name="chevronUp" size={18} />
+            <b>المحادثة</b>
+          </span>
+          {recent.length ? (
+            recent.map((m) => (
+              <span key={m.id} className="peek-line">
+                <b>{m.user?.name ?? ''}:</b> {m.kind === 'image' ? 'صورة' : m.body}
+              </span>
+            ))
+          ) : (
+            <span className="peek-line muted">لا توجد رسائل بعد.</span>
+          )}
+          <span className="peek-input">اكتب رسالة...</span>
+        </button>
+        {chatOpen && (
+          <Sheet title="المحادثة" onClose={() => setChatOpen(false)} tall>
+            {chat}
+          </Sheet>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="room">
@@ -344,24 +429,7 @@ function Room({ id }: { id: string }) {
           <Members room={room} meId={me.id} />
         </div>
       </div>
-      <div className={tab === 'chat' ? 'room-chat' : 'room-chat hide-on-mobile'}>
-        <Chat
-          roomId={room.id}
-          me={me}
-          role={room.role}
-          messages={messages}
-          hasMore={hasMore}
-          events={events}
-          typing={Object.values(typing).map((t) => t.name)}
-          onLoadMore={async () => {
-            const first = messages[0];
-            if (!first) return;
-            const r = await api.messages(id, first.createdAt);
-            setMessages((list) => [...r.messages, ...list]);
-            setHasMore(r.messages.length >= 50);
-          }}
-        />
-      </div>
+      <div className={tab === 'chat' ? 'room-chat' : 'room-chat hide-on-mobile'}>{chat}</div>
     </div>
   );
 }

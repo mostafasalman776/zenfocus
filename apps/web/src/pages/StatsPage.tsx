@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 import { Icon } from '../components/Icon';
 import { PageSkeleton } from '../components/Skeleton';
+import { useIsMobile } from '../lib/hooks';
 import { api } from '../lib/api';
 import { RequireAccount } from './RequireAccount';
 
@@ -24,17 +25,19 @@ const ROW_LABELS = ['السبت', '', 'الاثنين', '', 'الأربعاء', 
 
 function Stats() {
   const q = useQuery({ queryKey: ['stats'], queryFn: api.stats });
+  const isMobile = useIsMobile();
+  const WEEKS = isMobile ? 12 : 26;
   const s = q.data;
   if (!s) return <PageSkeleton blocks={[110, 230, 260]} />;
 
   const today = cairoDay(new Date());
   // 26 weeks of columns, each Saturday → Friday, ending with the current week.
   const sinceSat = (weekday(today) + 1) % 7;
-  const start = addDays(today, -sinceSat - 25 * 7);
-  const weeks = Array.from({ length: 26 }, (_, w) =>
+  const start = addDays(today, -sinceSat - (WEEKS - 1) * 7);
+  const weeks = Array.from({ length: WEEKS }, (_, w) =>
     Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d))
   );
-  const thisWeek = weeks[25]!;
+  const thisWeek = weeks[WEEKS - 1]!;
   const maxDay = Math.max(3600, ...thisWeek.map((d) => s.days[d] ?? 0));
   const weekTotal = thisWeek.reduce((a, d) => a + (s.days[d] ?? 0), 0);
   const tagTotal = s.tags.reduce((a, t) => a + t.seconds, 0) || 1;
@@ -113,7 +116,7 @@ function Stats() {
               <span key={i}>{l}</span>
             ))}
           </div>
-          <div className="heat-grid">
+          <div className="heat-grid" style={{ gridTemplateColumns: `repeat(${WEEKS}, minmax(0, 1fr))` }}>
             {weeks.map((week, w) => {
               const month = Number(week[0]!.slice(5, 7)) - 1;
               const prev = w ? Number(weeks[w - 1]![0]!.slice(5, 7)) - 1 : -1;
@@ -151,7 +154,7 @@ function Stats() {
                   <span className="num">{sec ? formatDuration(sec) : '—'}</span>
                   <div
                     className={`fill${day === today ? ' today' : ''}${sec ? '' : ' zero'}`}
-                    style={{ height: `${Math.max(3, (sec / maxDay) * 140)}px` }}
+                    style={{ height: `${Math.max(3, (sec / maxDay) * (isMobile ? 70 : 140))}px` }}
                   />
                   <span>{DAY_NAMES[weekday(day)]}</span>
                 </div>
@@ -160,7 +163,7 @@ function Stats() {
           </div>
         </section>
 
-        <section className="card" aria-label="التوزيع">
+        {!isMobile && <section className="card" aria-label="التوزيع">
           <div className="card-head">
             <h2>توزيع الوقت</h2>
           </div>
@@ -176,7 +179,7 @@ function Stats() {
               </div>
             </div>
           ))}
-        </section>
+        </section>}
       </div>
     </>
   );

@@ -5,7 +5,8 @@ import { Link } from 'react-router';
 import { Avatar, Icon } from '../components/Icon';
 import { PageSkeleton } from '../components/Skeleton';
 import { ApiError, api } from '../lib/api';
-import { useMe } from '../lib/hooks';
+import { useIsMobile, useMe } from '../lib/hooks';
+import { Sheet } from '../components/Sheet';
 import { RequireAccount } from './RequireAccount';
 
 const PERIODS: { id: LeaderboardPeriod; label: string }[] = [
@@ -184,15 +185,22 @@ function Board() {
   const ahead = myIdx > 0 ? rows[myIdx - 1] : null;
   const gap = ahead ? ahead.seconds - rows[myIdx]!.seconds : 0;
   const [first, second, third] = rows;
+  const isMobile = useIsMobile();
+  const [friendsOpen, setFriendsOpen] = useState(false);
   if (q.isLoading) return <PageSkeleton blocks={[200, 90, 320]} />;
 
   return (
     <>
       <header className="page-head">
-        <div>
+        <div className="m-head-row">
           <h1>المنافسة</h1>
+          {isMobile && (
+            <button type="button" className="icon-btn" aria-label="الأصدقاء" onClick={() => setFriendsOpen(true)}>
+              <Icon name="userPlus" size={20} />
+            </button>
+          )}
         </div>
-        <div className="segmented" role="tablist" aria-label="الفترة">
+        <div className="segmented period-tabs" role="tablist" aria-label="الفترة">
           {PERIODS.map((p) => (
             <button key={p.id} type="button" role="tab" aria-selected={period === p.id} onClick={() => setPeriod(p.id)}>
               {p.label}
@@ -266,7 +274,15 @@ function Board() {
           </section>
           )}
         </div>
-        <Friends />
+        {isMobile ? (
+          friendsOpen && (
+            <Sheet title="الأصدقاء" onClose={() => setFriendsOpen(false)} tall>
+              <Friends />
+            </Sheet>
+          )
+        ) : (
+          <Friends />
+        )}
       </div>
     </>
   );

@@ -57,6 +57,8 @@ function RoomList() {
             <p className="empty">لا توجد غرف بعد.</p>
           )}
         </section>
+        <div className="stack" style={{ gap: 16 }}>
+        <JoinByLink />
         <section className="card" aria-label="غرفة جديدة">
           <div className="card-head">
             <h2>غرفة جديدة</h2>
@@ -90,8 +92,40 @@ function RoomList() {
             </p>
           )}
         </section>
+        </div>
       </div>
     </>
+  );
+}
+
+/** Paste an invite link (or code) to open its join page. */
+function JoinByLink() {
+  const navigate = useNavigate();
+  const [value, setValue] = useState('');
+  return (
+    <section className="card join-link" aria-label="الانضمام برابط دعوة">
+      <div className="card-head">
+        <h2>
+          <Icon name="link" size={18} /> الانضمام برابط دعوة
+        </h2>
+      </div>
+      <form
+        className="task-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const code = value.trim().split('/').filter(Boolean).pop();
+          if (code) navigate(`/r/${encodeURIComponent(code)}`);
+        }}
+      >
+        <label htmlFor="invite-link" className="sr-only">
+          رابط الدعوة
+        </label>
+        <input id="invite-link" className="input" dir="ltr" placeholder="https://…/r/ROOM-XXXX" value={value} onChange={(e) => setValue(e.target.value)} />
+        <button type="submit" className="btn" disabled={!value.trim()}>
+          انضمام
+        </button>
+      </form>
+    </section>
   );
 }
 

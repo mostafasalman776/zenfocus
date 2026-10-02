@@ -5,6 +5,8 @@ import { api } from '../lib/api';
 import { loadInvite, loadPref, savePref } from '../lib/guest';
 import { useMe, useTimerEngine } from '../lib/hooks';
 import { usePendingRoomRedirect } from '../pages/RoomsPage';
+import { FriendsPresence } from './Presence';
+import { Sheet } from './Sheet';
 import { useTimer } from '../stores/timer';
 import { Avatar, Icon, type IconName } from './Icon';
 
@@ -90,6 +92,9 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   useTimerEngine(me);
+  const [accountOpen, setAccountOpen] = useState(false);
+  // Inside a room the phone shows the room's own header and composer instead.
+  const inRoom = /^\/rooms\/[^/]+/.test(location.pathname);
   usePendingRoomRedirect();
 
   // New accounts pick a username before anything else.
@@ -107,7 +112,7 @@ export function Layout() {
   const navItems = NAV.map((item) => ({ ...item, locked: item.needsAccount && !me }));
 
   return (
-    <div className="app">
+    <div className={`app${inRoom ? ' in-room' : ''}`}>
       <aside className="side">
         <NavLink to="/" className="logo" aria-label="ZenFocus">
           <Icon name="feather" size={26} />
@@ -161,16 +166,42 @@ export function Layout() {
             <span style={{ fontSize: 20 }}>ZenFocus</span>
           </NavLink>
           <div className="head-actions">
-            <ThemeToggle />
             {me ? (
-              <button type="button" className="icon-btn" aria-label="تسجيل الخروج" onClick={logout}>
-                <Icon name="logout" size={18} />
-              </button>
+              <>
+                <FriendsPresence />
+                <button type="button" className="account-btn" aria-label="الحساب" onClick={() => setAccountOpen(true)}>
+                  <Avatar name={me.name} src={me.avatarUrl} id={me.id} size={36} />
+                </button>
+              </>
             ) : (
               <LoginButton className="btn sm" />
             )}
           </div>
         </div>
+        {accountOpen && me && (
+          <Sheet title="الحساب" onClose={() => setAccountOpen(false)}>
+            <div className="account-head">
+              <Avatar name={me.name} src={me.avatarUrl} id={me.id} size={48} />
+              <div>
+                <b>{me.name}</b>
+                {me.username && <span className="muted" dir="ltr">@{me.username}</span>}
+              </div>
+            </div>
+            <div className="account-row">
+              <span>المظهر</span>
+              <ThemeToggle />
+            </div>
+            <div className="account-links">
+              <NavLink to="/privacy" onClick={() => setAccountOpen(false)}>سياسة الخصوصية</NavLink>
+              <NavLink to="/terms" onClick={() => setAccountOpen(false)}>شروط الاستخدام</NavLink>
+              {me.isAdmin && <NavLink to="/admin" onClick={() => setAccountOpen(false)}>البلاغات</NavLink>}
+            </div>
+            <button type="button" className="btn danger" onClick={() => { setAccountOpen(false); void logout(); }}>
+              <Icon name="logout" size={18} />
+              تسجيل الخروج
+            </button>
+          </Sheet>
+        )}
         <Outlet context={{ themeToggle: <ThemeToggle /> }} />
       </main>
 
